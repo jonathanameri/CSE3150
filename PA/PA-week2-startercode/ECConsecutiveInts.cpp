@@ -22,50 +22,64 @@ using namespace std;
 // stoi:  convert string to integer (be careful about how to handle exception)
 // and so on..
 bool nextPow(int i, int curLen, string &strInput){
-  string curNum = strInput.substr(i,curLen);
-  for(int j = 0; j < curNum.size(); j++){
-    if (curNum[j] != '9') return false;
+  if(i+curLen < (strInput.length()-1)){
+    string curNum = strInput.substr(i,curLen);
+    for(int j = 0; j < curNum.size(); j++){
+      if (curNum[j] != '9') return false;
+    }
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool ECConsecutiveInts(const string &strInput)
 {
+  //First check if every character is a digit
+  for(int d = 0; d < strInput.length(); d++){
+    if (!isdigit(strInput[d])) return false;
+  }
   int curLen = 1;
   int maxLen = 6;
-  int n = strInput.size();
   int curNum;
   int nextNum;
   bool res;
   bool inc;
-  string str = strInput;
+  string str = strInput; //Compiler was complaining about the 'const' and this fixed it
+  int n = str.length();
   while(curLen <= maxLen){
     int i = 0;
     res = true;
     while(i < n){
       inc = false;
-      curNum = stoi(strInput.substr(i,curLen));
+      if(i+curLen <= n){
+        curNum = stoi(str.substr(i,curLen)); //Get current number
+        // cout << curNum << endl;
+      }
+
+      i = i+curLen; //Increment pointer to next number
       if(nextPow(i,curLen,str)){
         curLen++;
         inc = true;
       }
-      if(i+curLen < (n-1)){
-        if(inc) {
-          nextNum = stoi(strInput.substr(i+curLen-1,curLen));
-        }
-        else {
-          nextNum = stoi(strInput.substr(i+curLen,curLen));
-        }
-        
+      // cout<< i << " " << curLen << " " << n << endl;
+      if(i+curLen <= n){
+        // cout<< "taking next num" << endl;
+        nextNum = stoi(str.substr(i,curLen));
       }
+      cout << curNum << endl;
+      cout << nextNum << endl;
+    
       if (nextNum - curNum != 1) {
         res = false;
         break;
       }
-      i = i + curLen;
+      else if (i + curLen == n){
+        return true;
+      }
+      
     }
     if (res == true) return true;
-    curLen++;
+    if(!inc) curLen++;
   }
   return false;
 }
