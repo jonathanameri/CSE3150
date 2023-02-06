@@ -31,7 +31,13 @@ int main()
     cout << "NOT Consecutive\n";
   }
   // NOT consecutive
-  string c = "123124125127";
+
+  string c = "979899100101";
+  c="";
+  for(int i = 0; i < 11; i++){
+    c+= i;
+  }
+  // c="9979989991000";
   bool fc = ECConsecutiveInts(c);
   if(fc)
   {

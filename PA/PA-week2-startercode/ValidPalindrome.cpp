@@ -27,6 +27,7 @@ bool IsValidPalindrome(const string &strInput)
         while(!isalnum(strInput[n-1])){
             n--;
         }
+        if (i >= n) break;
         if (tolower(strInput[i]) != tolower(strInput[n-1])) return false;
         i++;
         n--;

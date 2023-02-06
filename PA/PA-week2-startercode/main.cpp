@@ -1,6 +1,10 @@
 #include <iostream>
 #include <string>
+#include <cstdio>
+#include <ctype.h>
 using namespace std;
+
+
 
 extern std::string ECLongestPrefix(int numStrings, const std::string arrayStrings[]);
 extern bool IsValidPalindrome(const string &strInput);
@@ -12,6 +16,7 @@ extern bool IsValidPalindrome(const string &strInput);
 int main(){
     string arr[3] = {"racecar", "racingcar", "racist"};
     // string res = ECLongestPrefix(3, arr);
-    bool res = IsValidPalindrome("A man, a plan, a canal  Panama");
+    bool res = IsValidPalindrome(" ");
+    // res = isalnum('2');
     cout << res << endl;
 }
