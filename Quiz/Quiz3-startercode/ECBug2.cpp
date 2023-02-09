@@ -8,9 +8,15 @@ string ECTernary(int x)
   string res;
   switch(x)
   {
-    case 0: res = "0"; 
-    case 1: res = "1"; 
-    case 2: res = "2"; 
+    case 0: 
+    res = "0"; 
+    break;
+    case 1: 
+    res = "1"; 
+    break;
+    case 2: 
+    res = "2"; 
+    break;
     default: res = "not ternary";
   }
   return res;

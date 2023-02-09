@@ -4,4 +4,9 @@
 // Now define and implement ECProcArray...
 
 
-
+void ECProcArray(int *x, int size, void(*pf)(int)){
+    for (int i = 0; i < size; i++){
+        pf(*x);
+        x++;
+    }
+}
