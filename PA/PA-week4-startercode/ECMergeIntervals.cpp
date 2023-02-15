@@ -8,5 +8,5 @@ using namespace std;
 
 void ECMergeIntervals(const std::vector<std::pair<int,int> > &listIntervals, std::vector<std::pair<int,int> > &listNonOverlapIntervals)
 {
-  // your code here...
+  
 }
