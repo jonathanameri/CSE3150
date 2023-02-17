@@ -5,6 +5,14 @@ using namespace std;
 
 int ECSumList(const set<int> &listNums)
 {
-  // your code goes here ...
+  int res = 0;
+  // for(auto it = listNums.begin(); it != listNums.end(); it++)
+  for( auto x: listNums)
+  {
+
+    // res += *it;
+    res += x;
+  }
+  return res;
 }
 

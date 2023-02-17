@@ -5,8 +5,19 @@
 #include <algorithm>
 using namespace std;
 
-bool ECCommonNumber(const vector<...> &listA, const vector<...> &listB, ... &val)
+template < class T >
+bool ECCommonNumber(const vector<T> &listA, const vector<T> &listB, T &val)
 {
-  // your code here
+  for( auto x : listA)
+  {
+    for ( auto y : listB)
+    {
+      if ( x == y){
+        val = x;
+        return true;
+      }
+    }
+  }
+  return false;
 }
 

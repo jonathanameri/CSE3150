@@ -5,6 +5,9 @@ using namespace std;
 // return the sum of the numbers
 int ECSumList(const vector<int> &listNums)
 {
-  // your code goes here ...
+  int res = 0;
+  for (auto x : listNums){
+    res += x;
+  }
+  return res;
 }
-

@@ -5,8 +5,14 @@ using namespace std;
 
 // I want to have a generic function that can work with any types of numbers 
 // AND any type of container. Is this possible?
-int ECSumList(const vector<int> &listNums)
+template < class Container>
+typename Container :: value_type ECSumList(const Container &listNums)
 {
-  // your code goes here ...
+  typename Container :: value_type res = 0; 
+  for (auto x : listNums)
+  {
+    res += x;
+  }
+  return res;
 }
 

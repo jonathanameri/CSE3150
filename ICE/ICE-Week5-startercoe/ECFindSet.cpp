@@ -5,6 +5,6 @@ using namespace std;
 
 bool ECFind(const set<int> &listNums, int x)
 {
-  // your code
+  return listNums.find(x) != listNums.end();
 }
 

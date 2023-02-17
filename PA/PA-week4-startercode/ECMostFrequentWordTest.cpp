@@ -24,5 +24,11 @@ int main()
 
   string text2 = "how can I find the most frequent word, in an string, how?can I find how!how-string";
   ASSERT_EQ( ECMostFrequentWord(text2), string("how"));
+
+  string text3 = "the most 0 common 0 word in this 0 sentence 0 is 0 0";
+  ASSERT_EQ( ECMostFrequentWord(text3), string("0"));
+
+  string text4 = "!";
+  ASSERT_EQ( ECMostFrequentWord(text4), string(""));
 }
 
