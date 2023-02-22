@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 // (1): counting the number of subsets
@@ -30,7 +31,9 @@ int ECSubsetEnumCount(const std::vector<char> &vecChars)
 void findSubsets(vector<char> &v, int i, vector<char> &subset, set<vector<char>> &result)
 {
   if (!subset.empty()){
-    result.insert(subset);
+    // if(!count(result.begin(),result.end(),subset))
+      result.insert(subset);
+  // }
   }
 
   for(unsigned long j = i; j < v.size(); j++)
@@ -47,23 +50,31 @@ void findSubsets(vector<char> &v, int i, vector<char> &subset, set<vector<char>>
 void ECSubsetEnum(const std::vector<char> &vecChars, std::vector<vector<char> > &listSubsets)
 {
   set<vector<char> > result;
-  vector<char> subset;
+  vector<char> subset = {};
   // vector<char> v = const_cast<vector<char>* >(vecChars);
   vector<char> v = vecChars;
+  // for(auto i : vecChars){
+  //   v.push_back(i);
+  // }
+
+  // vector<char> mt = {};
+  // listSubsets.push_back(mt);
 
   findSubsets(v, 0, subset, result);
 
-  vector<char> mt = {};
-  listSubsets.push_back(mt);
-
   for(auto v: result)
   {
-    // for(auto i : v){
-    //   cout << i << " ";
-    // }
-    // cout << "\n";
-    // cout << '[' << v[0] << ',' << v[1] << ']' << endl;
     listSubsets.push_back(v);
   }
+
+  // for(auto v: result)
+  // {
+  //   // for(auto i : v){
+  //   //   cout << i << " ";
+  //   // }
+  //   // cout << "\n";
+  //   // cout << '[' << v[0] << ',' << v[1] << ']' << endl;
+  //   listSubsets.push_back(v);
+  // }
 
 }

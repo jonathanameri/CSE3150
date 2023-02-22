@@ -60,7 +60,21 @@ static void Test()
   ASSERT_EQ_NODUMP( listSubsets[3], vecs3 );
   ASSERT_EQ_NODUMP( listSubsets[4], vecs4 );
   ASSERT_EQ_NODUMP( listSubsets[5], vecs5 );
-  
+
+
+  vector<char> mt = {'1','2','3', '3', '4','4'};
+  vector<vector<char> > ls;
+  ECSubsetEnum(mt, ls);
+  std::sort( ls.begin(), ls.end() );
+
+  for(auto c : ls)
+  {
+    for (auto m : c)
+    {
+      cout << m << " ";
+    }
+    cout << endl;
+  }
 }
 
 int main()
