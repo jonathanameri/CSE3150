@@ -7,14 +7,15 @@
 class ECListNode
 {
 public:
-  ECListNode() {}
-  ECListNode *GetNext() const { ??? }
-  void SetNext(ECListNode *pn) { ??? }
-  int GetValue() const { ??? }
-  void SetValue(int v) { ??? }
+  ECListNode() : val(0), pNext(NULL) {}
+  ECListNode *GetNext() const { return pNext; }
+  void SetNext(ECListNode *pn) { pNext = pn;  }
+  int GetValue() const { return val; }
+  void SetValue(int v) { val = v; }
 
 private:
-  // ???
+  int val;
+  ECListNode *pNext;
 };
 
 #endif

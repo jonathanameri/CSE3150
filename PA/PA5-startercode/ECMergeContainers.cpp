@@ -5,19 +5,14 @@
 // Make your code short: at most 10 lines of code (LOC) 
 
 // now defiine ECMergeContainers ...
-using namespace std;
+#include <algorithm>
+#include <iterator>
 
-
-template <class container, class container2>
-typename container2 :: value_type ECMergeContainers(container &a, container2 &b)
+template <typename ContainerList, typename OutputContainer>
+void ECMergeContainers(const ContainerList& containers, OutputContainer& output)
 {
-    typename container2 :: value_type res;
-
-    for(auto k : container)
-    {
-        for(auto item : k)
-        {
-            
-        }
+    for (const auto& container : containers) {
+        std::copy(container.begin(), container.end(), std::inserter(output, output.end()));
     }
+    std::sort(output.begin(), output.end());
 }

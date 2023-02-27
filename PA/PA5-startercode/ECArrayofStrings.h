@@ -3,13 +3,13 @@
 
 using namespace std;
 #include <string>
-
 #include <vector>
 
 // define a class for an array of strings
 // use vector<string> to implement an array of strings
 class ECArrayofStrings
 {
+  
 public:
   ECArrayofStrings();
   ~ECArrayofStrings();
@@ -27,7 +27,8 @@ public:
   void Dump() const;
 
 private:
-  // your code
+  vector<string> stringArray;
+  string GetLongestCommonPrefixOfTwo(string a, string b) const;
 };
 
 

@@ -3,12 +3,13 @@
 
 class ECListNode;
 
-// Linked list 
+// Linked list
 class ECList
 {
 public:
   ECList();
-  
+  ~ECList();
+
   // insert node with value val after a node
   // if node is NULL, insert to the front
   void Insert(int val, ECListNode *pPre);

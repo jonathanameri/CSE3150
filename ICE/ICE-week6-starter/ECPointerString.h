@@ -14,6 +14,7 @@ public:
 	
 	ECStringPtr &operator=(const ECStringPtr &rhs);
 	void SetString(const std::string &strToSet);
+	std::string GetString() const;
 	const std::string *GetPtr() const;
 
         // Skip for the first pass. Create a string by duplicating itself, e.g. if this string is "abc", 
