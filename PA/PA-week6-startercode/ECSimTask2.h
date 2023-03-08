@@ -22,7 +22,20 @@ class ECMultiIntervalsTask : public ECSimTask
 {
 public:
     ECMultiIntervalsTask(const std::string &tid);
-    // your code here..    
+
+    //Add an interval to the task, includes start time, and end time, both stored in their own vectors
+    virtual void AddInterval(int tmStart, int tmEnd);
+
+    // Is task ready to run at certain time? tick: the current clock time (in simulation unit)
+    virtual bool IsReadyToRun(int tick) const;
+    
+    // Is task complete at certain time? If so, scheduler may remove it from the list. tick the current clock time (in simulation unit)
+    virtual bool IsFinished(int tick) const;
+
+private:
+    //Any given interval is [tmStarts[i], tmEnds[i]]
+    std::vector<int> tmStarts;
+    std::vector<int> tmEnds;
 };
 
 //***********************************************************
@@ -33,7 +46,15 @@ class ECHardIntervalTask : public ECSimTask
 public:
     ECHardIntervalTask(const std::string &tid, int tmStart, int tmEnd);
     
-    // your code here..    
+    // Is task ready to run at certain time? tick: the current clock time (in simulation unit)
+    virtual bool IsReadyToRun(int tick) const;
+    
+    // Is task complete at certain time? If so, scheduler may remove it from the list. tick the current clock time (in simulation unit)
+    virtual bool IsFinished(int tick) const;
+
+private:
+    int tmStart;
+    int tmEnd;
 };
 
 //***********************************************************
@@ -43,8 +64,23 @@ class ECConsecutiveIntervalTask : public ECSimTask
 {
 public:
     ECConsecutiveIntervalTask(const std::string &tid, int tmStart, int tmEnd);
+
+    virtual void Run(int tick, int duration);
+
+    virtual void Wait(int tick, int duration);
     
-    // your code here..    
+    // Is task ready to run at certain time? tick: the current clock time (in simulation unit)
+    virtual bool IsReadyToRun(int tick) const;
+    
+    // Is task complete at certain time? If so, scheduler may remove it from the list. tick the current clock time (in simulation unit)
+    virtual bool IsFinished(int tick) const;
+
+private:
+    int tmStart;
+    int tmEnd;
+    int numExec;
+    bool running;
+    bool wait;
 };
 
 //***********************************************************
@@ -55,8 +91,17 @@ class ECPeriodicTask : public ECSimTask
 public:
     // tickStart: when to start this periodic task; runLen: how long to run this task each time; sleepLen: after it finishes one run, hong long it will sleep
     ECPeriodicTask(const std::string &tid, int tmStart, int runLen, int sleepLen);
+
+    // Is task ready to run at certain time? tick: the current clock time (in simulation unit)
+    virtual bool IsReadyToRun(int tick) const;
     
-    // your code here..    
+    // Is task complete at certain time? If so, scheduler may remove it from the list. tick the current clock time (in simulation unit)
+    virtual bool IsFinished(int tick) const;
+
+private:
+    int tmStart;
+    int runLen;
+    int sleepLen;
 };
 
 #endif /* ECSimTask2_h */

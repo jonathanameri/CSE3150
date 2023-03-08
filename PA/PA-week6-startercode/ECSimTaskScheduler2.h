@@ -9,6 +9,7 @@
 #define ECSimTaskScheduler2_h
 
 #include "ECSimTaskScheduler.h"
+#include <map>
 
 // Now define your new schedulers here...
 
@@ -18,7 +19,8 @@ class ECSimLWTFTaskScheduler : public ECSimTaskScheduler
 {
 public:
     ECSimLWTFTaskScheduler();
-    // your code here    
+    
+    ECSimTask * ChooseTaskToSchedule(const std::vector<ECSimTask *> &listReadyTasks) const;
 };
 
 //***********************************************************
@@ -28,7 +30,7 @@ class ECSimPriorityScheduler : public ECSimTaskScheduler
 public:
     ECSimPriorityScheduler();
     
-    // your code here    
+    ECSimTask * ChooseTaskToSchedule(const std::vector<ECSimTask *> &listReadyTasks) const;  
 };
 
 //***********************************************************
@@ -37,8 +39,18 @@ class ECSimRoundRobinTaskScheduler : public ECSimTaskScheduler
 {
 public:
     ECSimRoundRobinTaskScheduler();
+
+    // int ECSimRoundRobinTaskScheduler :: Simulate(int duration);
+
+    ECSimTask * ChooseTaskToSchedule(const std::vector<ECSimTask *> &listReadyTasks) const;
+
+    // ECSimTask * ChooseTaskToSchedule2(const std::vector<ECSimTask *> &listReadyTasks);
     
-    // your code here    
+// private:
+    // std::map<ECSimTask *, int> mapTaskToRunTime;
+
+    // std::vector<ECSimTask *> listTasks;
+    // std::vector<int> listRunTime;
 };
 
 
