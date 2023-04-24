@@ -28,9 +28,16 @@ public:
     
     // Copy constructor
     ECPolynomial(const ECPolynomial &rhs);
+
+    ECPolynomial(const int size);
+        
     
     // Get the degree. Example: if polynomial=1+x+3x^3, degree=3
     int GetDegree() const;
+    
+    double GetCoeff(int i) const;
+
+    void SetCoeffAt(int i, double val);
     
     // Scale by a constant and return the resulting polynomial. For example, if polynomial is 1+3x, and
     // factor = 2, the result is 2+6x
@@ -56,6 +63,7 @@ public:
     
 private:
     // Your code here
+    std::vector<double> listCoeffs;
 };
 
 #endif /* ECPolynomial_h */

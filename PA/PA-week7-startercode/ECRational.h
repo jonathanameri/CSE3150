@@ -23,18 +23,26 @@ public:
     ECRational(const T &numeratorIn, const T &denominatorIn);
     
     // copy constructor
-    ...
+    ECRational(const ECRational &rhs);
  
     // assignment operator
-    ...
+    ECRational &operator=(const ECRational &rhs);
  
     // operators: define +, -, *, / operators yourself
+    ECRational operator+(const ECRational &rhs) const;
+    ECRational operator-(const ECRational &rhs) const;
+    ECRational operator*(const ECRational &rhs) const;
+    ECRational operator/(const ECRational &rhs) const;
+
+    
     
     // access numerator and denominator
     const T &GetNumerator() const; 
     const T &GetDenominator() const;
     
 private:
+    T numerator;
+    T denominator;
     // your code
 };
 
