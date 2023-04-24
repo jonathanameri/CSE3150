@@ -13,36 +13,79 @@ int main(int argc, char *argv[])
     ECTextDocument doc;
     
 
-    string str1 = "CSE 3150";
-    string str2 = "Jonathan Ameri";
-
-    doc.InsertRow(0, str1);
-    doc.InsertRow(1, str2);
-
+    // string str1 = "CSE 3150";
+    // string str2 = "Jonathan Ameri";
+    // doc.InsertRow(0, str1);
+    // doc.InsertRow(1, str2);
     ECTextDocumentCtrl docCtrl(doc);
 
-    for(int i = 0; i < doc.GetRowLen(0); i++)
-    {
-        cout << "Char at 0 " << i << ": " << doc.GetCharAt(0, i) << endl;
-    }
-    // cout << "Char at 0, 0 " << doc.GetCharAt(0, 0) << endl;
+    cout << "START" << endl;
+    doc.Dump();
 
-    docCtrl.InsertCharAt(0, 0, 'Z');
-    cout << endl << " AFTER INSERTING Z" << endl; 
+    docCtrl.HandleInput(0, 'Z');
+    cout << "AFTER INSERTING Z" << endl; 
+    doc.Dump();
 
-    for(int i = 0; i < doc.GetRowLen(0); i++)
-    {
-        cout << "Char at 0 " << i << ": " << doc.GetCharAt(0, i) << endl;
-    }
+    // cout << "DELETING 3" << endl;
+    // docCtrl.RemoveCharAt(0, 5);
+    // doc.Dump();
 
-    cout << "DELETING 3" << endl;
+    cout << "Insert using Cursor" << endl;
+    docCtrl.HandleInput(0, 'A');
+    docCtrl.HandleInput(0, 'B');
+    docCtrl.HandleInput(0, 'C');
+    doc.Dump();
 
-    docCtrl.RemoveCharAt(0, 5);
+    cout<< "Setting cursor to end of line 0" << endl;
+    doc.SetCursorX(doc.GetRowLen(0));
+    doc.SetCursorY(0);
+    doc.Dump();
+    cout<<"Hitting enter" << endl;
+    docCtrl.HandleInput(13, '0');
+    doc.Dump();
 
-    for(int i = 0; i < doc.GetRowLen(0); i++)
-    {
-        cout << "Char at 0 " << i << ": " << doc.GetCharAt(0, i) << endl;
-    }
+    cout<<"Same thing but setting cursor at location 0, 3"<<endl;
+    doc.SetCursorX(3);
+    doc.SetCursorY(0);
+    doc.Dump();
+    docCtrl.HandleInput(13, '0');
+    doc.Dump();
+
+    cout<<"Move cursor to the right"<<endl;
+    docCtrl.HandleInput(ARROW_RIGHT, '0');
+    docCtrl.HandleInput(ARROW_RIGHT, '0');
+    docCtrl.HandleInput(ARROW_RIGHT, '0');
+    docCtrl.HandleInput(ARROW_RIGHT, '0');
+    docCtrl.HandleInput(ARROW_RIGHT, '0');
+    doc.Dump();
+    cout<<"Move cursor up"<<endl;
+    docCtrl.HandleInput(ARROW_UP, '0');
+    doc.Dump();
+    cout<<"Move cursor up"<<endl;
+    docCtrl.HandleInput(ARROW_UP, '0');
+    doc.Dump();
+    cout<<"Move cursor down"<<endl;
+    docCtrl.HandleInput(ARROW_DOWN, '0');
+    doc.Dump();
+    cout<<"Move cursor down"<<endl;
+    docCtrl.HandleInput(ARROW_DOWN, '0');
+    doc.Dump();
+    cout<<"Move cursor down"<<endl;
+    docCtrl.HandleInput(ARROW_DOWN, '0');
+    doc.Dump();
+    cout<<"Delete"<<endl;
+    docCtrl.HandleInput(127, '0');
+    doc.Dump();
+    cout<<"Delete"<<endl;
+    docCtrl.HandleInput(127, '0');
+    doc.Dump();
+    cout<<"Delete"<<endl;
+    docCtrl.HandleInput(127, '0');
+    doc.Dump();
+    cout<<"Delete"<<endl;
+    docCtrl.HandleInput(127, '0');
+    doc.Dump();
+    
 
 
 

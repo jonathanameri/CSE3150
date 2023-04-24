@@ -3,8 +3,38 @@
 
 #include <vector>
 #include "ECCommand.h"
+#include "ECTextViewImp.h"
 
 class ECTextDocument;
+
+// **********************************************************
+// Command for new line
+class ECNewLineCmd : public ECCommand
+{
+public:
+    ECNewLineCmd( ECTextDocument &docIn, int rowIn );
+    void Execute();
+    void UnExecute();
+private:
+    ECTextDocument &doc;
+    int row;
+    int posAt;
+};
+
+
+// **********************************************************
+// Command for merging lines
+class ECMergeLineCmd : public ECCommand
+{
+public:
+    ECMergeLineCmd( ECTextDocument &docIn, int rowIn );
+    void Execute();
+    void UnExecute();
+private:
+    ECTextDocument &doc;
+    int row;
+};
+
 
 
 // **********************************************************
@@ -55,7 +85,9 @@ public:
     void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
     bool Undo();                                                            // undo any change you did to the text
     bool Redo();                                                            // redo the change to the text
-    
+    bool ValidCursorAfterDelete(int x, int y) const;                                                 // check if the cursor is valid
+    void HandleInput(int code, char ch);                                         // handle input from view
+
 private:
     ECTextDocument &doc;
     ECCommandHistory histCmds;
@@ -73,14 +105,19 @@ public:
     void InsertRow(int row, const std::string &str);    // insert a row of text
     int GetNumRows() const { return listRows.size(); }
     int GetRowLen(int row) const;
+    std::string GetRow(int row) const;
+    void SetRow(int row, std::string &str);
+    void RemoveRow(int row);
     char GetCharAt(int row, int pos) const;          // get char at current position
     void InsertCharAt(int row, int pos, char ch);    // insert a single char at position
     void RemoveCharAt(int row, int pos);             // erase a single char at position
-    
+
     int GetCursorX() const { return cursorX; }
     int GetCursorY() const { return cursorY; }
     void SetCursorX(int x) { cursorX = x; }
     void SetCursorY(int y) { cursorY = y; }
+
+    void Dump() const;
     
 private:
     ECTextDocumentCtrl docCtrl;
