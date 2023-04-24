@@ -193,7 +193,9 @@ void ECTextDocumentCtrl :: HandleInput(int code, char ch)
         histCmds.ExecuteCmd( pCmdNewLine );
     }
     else {
-        InsertCharAt(doc.GetCursorY(), doc.GetCursorX(), ch);
+        ECInsTextCmd *pCmdIns = new ECInsTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX(), ch );
+        histCmds.ExecuteCmd( pCmdIns );
+        // InsertCharAt(doc.GetCursorY(), doc.GetCursorX(), ch);
     }
 }
 
