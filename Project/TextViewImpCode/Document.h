@@ -51,8 +51,8 @@ class ECTextDocumentCtrl
 public:
     ECTextDocumentCtrl(ECTextDocument &docIn);          // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
-    void InsertTextAt(int row, int pos, char charIns);    // insert a list of characters starting at position
-    void RemoveTextAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
+    void InsertCharAt(int row, int pos, char charIns);    // insert a list of characters starting at position
+    void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
     bool Undo();                                                            // undo any change you did to the text
     bool Redo();                                                            // redo the change to the text
     
@@ -70,15 +70,25 @@ public:
     ECTextDocument();
     virtual ~ECTextDocument();
     ECTextDocumentCtrl &GetCtrl();          // return document controller
+    void InsertRow(int row, const std::string &str);    // insert a row of text
     int GetNumRows() const { return listRows.size(); }
-    // int GetRowLen(int row) const { return listRows[row].length(); }
+    int GetRowLen(int row) const;
     char GetCharAt(int row, int pos) const;          // get char at current position
     void InsertCharAt(int row, int pos, char ch);    // insert a single char at position
     void RemoveCharAt(int row, int pos);             // erase a single char at position
     
+    int GetCursorX() const { return cursorX; }
+    int GetCursorY() const { return cursorY; }
+    void SetCursorX(int x) { cursorX = x; }
+    void SetCursorY(int y) { cursorY = y; }
+    
 private:
     ECTextDocumentCtrl docCtrl;
     std::vector<std::string> listRows;
+    int cursorX;
+    int cursorY;
+    // std::map<int, std::map<int, std::pair<int, TEXT_COLOR> > > clrTextInfo;
+
 };
 
 

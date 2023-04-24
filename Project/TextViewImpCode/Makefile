@@ -12,7 +12,7 @@ $(TARGET) : $(TARGET).cpp
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(TARGET).cpp $(EXTRAS)
 
 clean:
-	rm  -f $(OUTPUT) *.o
+	rm  -f $(OUTPUT)
 
 
 

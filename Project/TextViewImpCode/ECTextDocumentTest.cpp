@@ -11,7 +11,38 @@ int main(int argc, char *argv[])
 {
     //
     ECTextDocument doc;
+    
+
+    string str1 = "CSE 3150";
+    string str2 = "Jonathan Ameri";
+
+    doc.InsertRow(0, str1);
+    doc.InsertRow(1, str2);
+
     ECTextDocumentCtrl docCtrl(doc);
+
+    for(int i = 0; i < doc.GetRowLen(0); i++)
+    {
+        cout << "Char at 0 " << i << ": " << doc.GetCharAt(0, i) << endl;
+    }
+    // cout << "Char at 0, 0 " << doc.GetCharAt(0, 0) << endl;
+
+    docCtrl.InsertCharAt(0, 0, 'Z');
+    cout << endl << " AFTER INSERTING Z" << endl; 
+
+    for(int i = 0; i < doc.GetRowLen(0); i++)
+    {
+        cout << "Char at 0 " << i << ": " << doc.GetCharAt(0, i) << endl;
+    }
+
+    cout << "DELETING 3" << endl;
+
+    docCtrl.RemoveCharAt(0, 5);
+
+    for(int i = 0; i < doc.GetRowLen(0); i++)
+    {
+        cout << "Char at 0 " << i << ": " << doc.GetCharAt(0, i) << endl;
+    }
 
 
 
