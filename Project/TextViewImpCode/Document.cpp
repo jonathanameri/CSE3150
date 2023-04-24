@@ -199,6 +199,12 @@ void ECTextDocumentCtrl :: HandleInput(int code, char ch)
     }
 }
 
+std::vector<std::string> ECTextDocumentCtrl :: GetDocument(ECEditorView &view) const
+{
+    return doc.GetDocument();
+}
+
+
 
 // **********************************************************
 //ECTextDocument
@@ -260,4 +266,9 @@ void ECTextDocument :: Dump() const
         cout << endl;
     }
     cout << "*********************************" << endl;
+}
+
+std::vector<std::string> ECTextDocument :: GetDocument() const
+{
+    return listRows;
 }

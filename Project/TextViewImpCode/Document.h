@@ -4,8 +4,10 @@
 #include <vector>
 #include "ECCommand.h"
 #include "ECTextViewImp.h"
+#include "ECEditorView.h"
 
 class ECTextDocument;
+class ECEditorView;
 
 // **********************************************************
 // Command for new line
@@ -87,6 +89,7 @@ public:
     bool Redo();                                                            // redo the change to the text
     bool ValidCursorAfterDelete(int x, int y) const;                                                 // check if the cursor is valid
     void HandleInput(int code, char ch);                                         // handle input from view
+    std::vector<std::string> GetDocument(ECEditorView &view) const;                             // update the view
 
 private:
     ECTextDocument &doc;
@@ -118,6 +121,7 @@ public:
     void SetCursorY(int y) { cursorY = y; }
 
     void Dump() const;
+    std::vector<std::string> GetDocument() const;
     
 private:
     ECTextDocumentCtrl docCtrl;

@@ -4,7 +4,7 @@ CFLAGS = -std=c++11
 
 TARGET = ECTextDocumentTest
 OUTPUT = editorTest
-EXTRAS = Document.cpp ECCommand.cpp 
+EXTRAS = Document.cpp ECCommand.cpp ECEditorView.cpp ECTextViewImp.cpp
 
 all: $(TARGET)
 
