@@ -1,10 +1,46 @@
 // Test code for editor
 #include "ECTextViewImp.h"
+#include "ECCommand.h"
+#include "Document.h"
 #include <iostream>
 
 using namespace  std;
 
 int myCounter = 0;
+
+
+class View : public ECObserver{
+    public:
+        View(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl)
+        {
+            _docCtrl = docCtrl;
+            _subject = subject;
+            _subject->Attach(this);
+        }
+        virtual void Update() {
+
+            cout << "View " << ++myCounter << " updated" << endl;
+        }
+    private:
+        ECTextViewImp *_subject;
+        ECTextDocumentCtrl *_docCtrl;
+};
+
+class Document{
+    public:
+        Document(ECTextDocumentCtrl *docCtrl)
+        {
+            _docCtrl = docCtrl;
+        }
+        void Update()
+        {
+            cout << "Document " << ++myCounter << " updated" << endl;
+        }
+    private:
+        ECTextDocumentCtrl *_docCtrl;
+};
+
+
 
 
 class ECObserverESCAPE : public ECObserver{
@@ -30,6 +66,9 @@ class ECObserverESCAPE : public ECObserver{
 int main(int argc, char *argv[])
 {
     //
+    
+
+
     ECTextViewImp wndTest;
     wndTest.AddRow("CSE 3150");
     wndTest.SetColor(0, 0, 0, TEXT_COLOR_RED);
