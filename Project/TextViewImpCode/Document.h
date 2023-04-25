@@ -8,6 +8,7 @@
 
 class ECTextDocument;
 class ECEditorView;
+class ECTextDocument;
 
 // **********************************************************
 // Command for new line
@@ -90,7 +91,8 @@ public:
     bool ValidCursorAfterDelete(int x, int y) const;                                                 // check if the cursor is valid
     void HandleInput(int code, char ch);                                         // handle input from view
     std::vector<std::string> GetDocument(ECEditorView &view) const;                             // update the view
-
+    int GetCursorX() const; 
+    int GetCursorY() const; 
 private:
     ECTextDocument &doc;
     ECCommandHistory histCmds;

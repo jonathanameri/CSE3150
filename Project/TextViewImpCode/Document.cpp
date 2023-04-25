@@ -204,6 +204,15 @@ std::vector<std::string> ECTextDocumentCtrl :: GetDocument(ECEditorView &view) c
     return doc.GetDocument();
 }
 
+int ECTextDocumentCtrl :: GetCursorX() const
+{
+    return doc.GetCursorX();
+}
+int ECTextDocumentCtrl :: GetCursorY() const
+{
+    return doc.GetCursorY();
+}
+
 
 
 // **********************************************************

@@ -3,6 +3,7 @@
 
 class ECTextDocumentCtrl;
 class ECTextViewImp;
+class ECTextDocument;
 
 using namespace std;
 
@@ -26,7 +27,8 @@ void ECEditorView :: Update(){
     for(int i = 0; i < document.size(); i++){
         _subject->AddRow(document[i]);
     }
-    // _subject->SetCursorX(_docCtrl->GetCursorX());
-    // _subject->SetCursorY(_docCtrl->GetCursorY());
+    _subject->SetCursorX(_docCtrl->GetCursorX());
+    _subject->SetCursorY(_docCtrl->GetCursorY());
+
 
 }
