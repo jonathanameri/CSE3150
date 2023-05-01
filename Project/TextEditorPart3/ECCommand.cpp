@@ -4,11 +4,6 @@
 // ******************************************************
 // Implement command history
 
-
-ECCommandHistory :: ECCommandHistory() : posCurrCmd(-1)
-{
-}
-
 ECCommandHistory :: ~ECCommandHistory()
 {
     for(unsigned int i=0; i<listCommands.size(); ++i)
@@ -56,5 +51,9 @@ void ECCommandHistory :: ExecuteCmd( ECCommand *pCmd )
     }
     listCommands.push_back(pCmd);
     ++posCurrCmd;
+}
+
+void ECCommandHistory:: AddCheckpoint(int x){
+    checkpoints.push_back(x);
 }
 

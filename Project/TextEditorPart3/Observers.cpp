@@ -8,25 +8,6 @@ class ECTextDocument;
 using namespace std;
 
 //***********************************************************
-//GeneralObserver
-// GeneralObserver :: GeneralObserver(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl){
-//     this->_subject = subject;
-//     this->_docCtrl = docCtrl;
-// }
-
-void GeneralObserver :: MakeChanges(){
-    //Get document from controller and update the view
-    _subject->InitRows();
-    _subject->ClearColor();
-    vector<string> document = _docCtrl->GetDocument();
-    for(int i = 0; i < document.size(); i++){
-        _subject->AddRow(document[i]);
-    }
-    _subject->SetCursorX(_docCtrl->GetCursorX());
-    _subject->SetCursorY(_docCtrl->GetCursorY());
-}
-
-//***********************************************************
 //ArrowKeyObserver
 void ArrowKeyObserver :: Update(){
     int code = _subject->GetPressedKey();
@@ -72,7 +53,6 @@ void BackspaceObserver :: Update(){
                 else
                 {
                     _docCtrl->MergeLineCommand();
-                    
                 }
             }
             else{
@@ -97,7 +77,12 @@ void EnterObserver :: Update(){
 //InsertObserver
 void InsertObserver :: Update(){
     int code = _subject->GetPressedKey();
+    if(_docCtrl->GetMode() == 0 && (char)code == 'i'){
+        _docCtrl->SetMode(1);
+        return;
+    }
 
+    if(_docCtrl->GetMode() != 1) return;
     //Hardcoded for now... May change to be initialized in the main file
 
     //If key is a command, ignore, otherwise insert the character
@@ -110,23 +95,32 @@ void InsertObserver :: Update(){
 
     //If in insert mode, insert the character
     //If in command mode but key is 'i', switch to insert mode
-    if(_docCtrl->GetMode() == 0 && (char)code == 'i'){
-        _docCtrl->SetMode(1);
-    }
-    else if(_docCtrl->GetMode() == 1){
-        _docCtrl->InsertTextCommand( (char)code );
-        _docCtrl->UpdateView();
-    }
+    _docCtrl->InsertTextCommand( (char)code );
+    _docCtrl->UpdateView();
 }
-
 
 //***********************************************************
 //EscapeObserver
 void EscapeObserver :: Update(){
+    if(_docCtrl->GetMode() != 1) return;
     int code = _subject->GetPressedKey();
     if(code == 27 || code == 1){
         _docCtrl->SetMode(0);
     }
+}
+
+//***********************************************************
+//UndoRedoObserver
+void UndoRedoObserver :: Update(){
+    if(_docCtrl->GetMode() != 0) return;
+    int code = _subject->GetPressedKey();
+    if(code == 26){
+        _docCtrl->Undo();
+    }
+    else if(code == 25){
+        _docCtrl->Redo();
+    }
+    _docCtrl->UpdateView();
 }
 
 ECEditorView :: ECEditorView(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl){
@@ -136,6 +130,7 @@ ECEditorView :: ECEditorView(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl
     EnterObserver *enterObserver = new EnterObserver(subject, docCtrl);
     InsertObserver *insertObserver = new InsertObserver(subject, docCtrl);
     EscapeObserver *escapeObserver = new EscapeObserver(subject, docCtrl);
+    UndoRedoObserver *undoRedoObserver = new UndoRedoObserver(subject, docCtrl);
 
     //Attach Observers
     subject->Attach(arrowKeyObserver);
@@ -143,4 +138,5 @@ ECEditorView :: ECEditorView(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl
     subject->Attach(enterObserver);
     subject->Attach(insertObserver);
     subject->Attach(escapeObserver);
+    subject->Attach(undoRedoObserver);
 }

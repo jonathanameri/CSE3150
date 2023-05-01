@@ -10,6 +10,11 @@ class ECTextDocument;
 class ECEditorView;
 class ECTextDocument;
 
+//***********************************************************
+// Checkpoint command
+
+
+
 // **********************************************************
 // Command for new line
 class ECNewLineCmd : public ECCommand
@@ -21,7 +26,9 @@ public:
 private:
     ECTextDocument &doc;
     int row;
-    int posAt;
+    int cursorX;
+    int cursorY;
+    std::string oldLine;
 };
 
 
@@ -36,6 +43,10 @@ public:
 private:
     ECTextDocument &doc;
     int row;
+    std::string str1;
+    std::string str2;
+    int cursorX;
+    int cursorY;
 };
 
 // **********************************************************
@@ -77,7 +88,7 @@ private:
 class ECTextDocumentCtrl
 {
 public:
-    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename) : doc(docIn), mode(0), _view(view), _filename(filename) {};     // conroller constructor takes the document as input
+    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename) : doc(docIn), _view(view), _filename(filename), mode(0), numCommands(0) {};     // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
     void InsertCharAt(int row, int pos, char charIns);    // insert a list of characters starting at position
     void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
@@ -111,6 +122,7 @@ private:
     ECCommandHistory histCmds;
     int mode;   //0 for command mode, 1 for insert mode
     std::string _filename;
+    int numCommands;
 };
 
 // **********************************************************

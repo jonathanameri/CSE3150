@@ -20,15 +20,18 @@ public:
 class ECCommandHistory
 {
 public:
-    ECCommandHistory();
+    ECCommandHistory() : posCurrCmd(-1), posCheckpoint(-1) {} ;
     virtual ~ECCommandHistory();
     bool Undo();
     bool Redo();
     void ExecuteCmd( ECCommand *pCmd );
+    void AddCheckpoint(int x);
     
 private:
     std::vector<ECCommand *> listCommands;
     int posCurrCmd;
+    std::vector<int> checkpoints;
+    int posCheckpoint;
 };
 
 

@@ -23,7 +23,7 @@ class GeneralObserver : public ECObserver
 {
 public:
     GeneralObserver(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl) : _subject(subject), _docCtrl(docCtrl) {};
-    void MakeChanges();
+    // void MakeChanges();
 private:
     ECTextViewImp *_subject;
     ECTextDocumentCtrl *_docCtrl;
@@ -88,5 +88,16 @@ private:
     ECTextViewImp *_subject;
     ECTextDocumentCtrl *_docCtrl;
 };
+
+class UndoRedoObserver : public GeneralObserver
+{
+public:
+    UndoRedoObserver(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl) : _subject(subject), _docCtrl(docCtrl), GeneralObserver(subject, docCtrl) {};
+    void Update();
+private:
+    ECTextViewImp *_subject;
+    ECTextDocumentCtrl *_docCtrl;
+};
+
 
 #endif /* EDITORVIEW_H */
