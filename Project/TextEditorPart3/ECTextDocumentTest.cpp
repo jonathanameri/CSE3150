@@ -23,16 +23,17 @@ int main(int argc, char *argv[])
     //Initialize document and controller
     //Model in MVC
     ECTextDocument doc;
-    //Controller in MVC
-    ECTextDocumentCtrl docCtrl(doc);
-
     //View in MVC
     ECTextViewImp wndTest;
+    //Controller in MVC
+    ECTextDocumentCtrl docCtrl(doc, &wndTest, filename);
+
+    //Doc controller is initialized with reference to document and view, controller is the one making changes to both
 
     //EditorView is in charge of creating and attaching all observers
     ECEditorView *editorView = new ECEditorView(&wndTest, &docCtrl);
 
-    wndTest.AddStatusRow("Edit Mode", filename , true);
+    wndTest.AddStatusRow("Command Mode", filename , true);
     wndTest.Show();
     
     return 0;

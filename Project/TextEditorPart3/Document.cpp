@@ -6,9 +6,6 @@ using namespace std;
 
 // **********************************************************
 // Command for new line
-ECNewLineCmd :: ECNewLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn)
-{}
-
 void ECNewLineCmd :: Execute()
 {
     //Check if mid line or at end of line
@@ -45,9 +42,6 @@ void ECNewLineCmd :: UnExecute()
 
 // **********************************************************
 // Command for merging lines
-ECMergeLineCmd :: ECMergeLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn)
-{}
-
 void ECMergeLineCmd :: Execute()
 {
     string str1 = doc.GetRow(row);
@@ -69,9 +63,6 @@ void ECMergeLineCmd ::UnExecute()
 
 // **********************************************************
 // Command for insertion
-ECInsTextCmd :: ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns ) : doc(docIn), row(row), posIns(posInsIn), charIns(charIns)
-{}
-
 void ECInsTextCmd :: Execute()
 {
     // insert to document
@@ -86,8 +77,6 @@ void ECInsTextCmd :: UnExecute()
 
 // **********************************************************
 // Command for deletion
-ECDelTextCmd :: ECDelTextCmd( ECTextDocument &docIn, int rowDelIn, int posDelIn ) : doc(docIn), rowDel(rowDelIn), posDel(posDelIn)
-{}
 ECDelTextCmd :: ~ECDelTextCmd()
 {
     listCharsDel.clear();
@@ -112,7 +101,6 @@ void ECDelTextCmd :: UnExecute()
 
 // **********************************************************
 // Controller for text document
-ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn) : doc(docIn){}
 ECTextDocumentCtrl :: ~ECTextDocumentCtrl(){}
 void ECTextDocumentCtrl :: InsertCharAt(int row, int pos, char charIns)
 {
@@ -132,25 +120,47 @@ bool ECTextDocumentCtrl :: Redo()
 {
     return histCmds.Redo();
 }
+void ECTextDocumentCtrl :: UpdateView(){
+    if(mode == 1){
+        //Make Changes
+        _view->InitRows();
+        _view->ClearColor();
+        vector<string> document = GetDocument();
+        for(int i = 0; i < document.size(); i++){
+            _view->AddRow(document[i]);
+        }
+        _view->SetCursorX(GetCursorX());
+        _view->SetCursorY(GetCursorY());
+    }
+    else if (mode == 0){
+        _view->SetCursorX(GetCursorX());
+        _view->SetCursorY(GetCursorY());
+    }
+}
 
+//Commands called by observer
 void ECTextDocumentCtrl :: MergeLineCommand()
 {
+    if(mode != 1) return;
     ECMergeLineCmd *pCmdMerge = new ECMergeLineCmd( this->doc, doc.GetCursorY() );
     histCmds.ExecuteCmd( pCmdMerge );
 }
 
 void ECTextDocumentCtrl :: DeleteTextCommand()
 {
+    if(mode != 1 ) return;
     ECDelTextCmd *pCmdDel = new ECDelTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX() - 1);
     histCmds.ExecuteCmd( pCmdDel );
 }
 void ECTextDocumentCtrl :: NewLineCommand()
 {
+    if(mode != 1 ) return;
     ECNewLineCmd *pCmdNewLine = new ECNewLineCmd( this->doc, doc.GetCursorY() );
     histCmds.ExecuteCmd( pCmdNewLine );
 }
 void ECTextDocumentCtrl :: InsertTextCommand(char ch)
 {
+    if(mode != 1 ) return;
     ECInsTextCmd *pCmdIns = new ECInsTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX(), ch );
     histCmds.ExecuteCmd( pCmdIns );
 }
@@ -186,19 +196,31 @@ int ECTextDocumentCtrl :: GetNumRows() const
 {
     return doc.GetNumRows();
 }
+int ECTextDocumentCtrl :: GetMode() const
+{
+    return mode;
+}
+void ECTextDocumentCtrl :: SetMode(int mode)
+{
+    this->mode = mode;
+    if(mode == 0){
+        _view->ClearStatusRows();
+        _view->AddStatusRow("Command Mode", _filename, true);
+    }
+    else if (mode == 1){
+        _view->ClearStatusRows();
+        _view->AddStatusRow("Insert Mode", _filename, true);
+    }
+}
 
 
 
 // **********************************************************
 //ECTextDocument
-ECTextDocument :: ECTextDocument() : docCtrl(*this) , cursorX(0), cursorY(0){ listRows.push_back(""); }
+ECTextDocument :: ECTextDocument() : cursorX(0), cursorY(0){ listRows.push_back(""); }
 ECTextDocument :: ~ECTextDocument()
 {
     listRows.clear();
-}
-ECTextDocumentCtrl & ECTextDocument :: GetCtrl()
-{
-    return docCtrl;
 }
 void ECTextDocument :: InsertRow(int row, const std::string &str)
 {

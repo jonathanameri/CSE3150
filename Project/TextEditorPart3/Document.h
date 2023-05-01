@@ -15,7 +15,7 @@ class ECTextDocument;
 class ECNewLineCmd : public ECCommand
 {
 public:
-    ECNewLineCmd( ECTextDocument &docIn, int rowIn );
+    ECNewLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
     void Execute();
     void UnExecute();
 private:
@@ -30,7 +30,7 @@ private:
 class ECMergeLineCmd : public ECCommand
 {
 public:
-    ECMergeLineCmd( ECTextDocument &docIn, int rowIn );
+    ECMergeLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
     void Execute();
     void UnExecute();
 private:
@@ -38,15 +38,12 @@ private:
     int row;
 };
 
-
-
 // **********************************************************
 // Command for insertion
-
 class ECInsTextCmd : public ECCommand
 {
 public:
-    ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns );
+    ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns ) : doc(docIn), row(row), posIns(posInsIn), charIns(charIns) {};
     void Execute();
     void UnExecute();
     
@@ -59,11 +56,10 @@ private:
 
 // **********************************************************
 // Command for deletion
-
 class ECDelTextCmd : public ECCommand
 {
 public:
-    ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn);
+    ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn) : doc(docIn), rowDel(rowDel), posDel(posDelIn) {} ;
     ~ECDelTextCmd();
     virtual void Execute();
     virtual void UnExecute();
@@ -78,21 +74,26 @@ private:
 
 // **********************************************************
 // Controller for text document
-
 class ECTextDocumentCtrl
 {
 public:
-    ECTextDocumentCtrl(ECTextDocument &docIn);          // conroller constructor takes the document as input
+    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename) : doc(docIn), mode(0), _view(view), _filename(filename) {};     // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
     void InsertCharAt(int row, int pos, char charIns);    // insert a list of characters starting at position
     void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
     bool Undo();                                                            // undo any change you did to the text
     bool Redo();                                                            // redo the change to the text
+    //outdated HandleInput Function
     void HandleInput(int code, char ch);                                         // handle input from view
+    
+    //Commands needed to update the model
     void MergeLineCommand();
     void DeleteTextCommand();
     void NewLineCommand();
     void InsertTextCommand(char ch);
+
+    //Function to update the view
+    void UpdateView();
 
     //Getters and Setters
     std::vector<std::string> GetDocument() const;                             // update the view
@@ -102,9 +103,14 @@ public:
     void SetCursorY(int y);
     int GetRowLen(int row) const;
     int GetNumRows() const;
+    int GetMode() const;
+    void SetMode(int mode);
 private:
     ECTextDocument &doc;
+    ECTextViewImp *_view;
     ECCommandHistory histCmds;
+    int mode;   //0 for command mode, 1 for insert mode
+    std::string _filename;
 };
 
 // **********************************************************
@@ -135,7 +141,6 @@ public:
     std::vector<std::string> GetDocument() const;
     
 private:
-    ECTextDocumentCtrl docCtrl;
     std::vector<std::string> listRows;
     int cursorX;
     int cursorY;

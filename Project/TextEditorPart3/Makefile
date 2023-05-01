@@ -3,7 +3,7 @@ CC = g++
 CFLAGS = -std=c++11
 
 TARGET = ECTextDocumentTest
-OUTPUT = editorTest
+OUTPUT = myeditor
 EXTRAS = Document.cpp ECCommand.cpp ECTextViewImp.cpp Observers.cpp
 
 all: $(TARGET)

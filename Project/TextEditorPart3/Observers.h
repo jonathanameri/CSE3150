@@ -12,14 +12,10 @@ class ECTextDocumentCtrl;
 class ECTextViewImp;
 
 //***********************************************************
-class ECEditorView : public ECObserver
+class ECEditorView
 {
 public:
     ECEditorView(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl);
-    void Update();
-private:
-    ECTextViewImp *_subject;
-    ECTextDocumentCtrl *_docCtrl;
 };
 
 //***********************************************************
@@ -83,5 +79,14 @@ private:
     ECTextDocumentCtrl *_docCtrl;
 };
 
+class EscapeObserver : public GeneralObserver
+{
+public:
+    EscapeObserver(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl) : _subject(subject), _docCtrl(docCtrl), GeneralObserver(subject, docCtrl) {};
+    void Update();
+private:
+    ECTextViewImp *_subject;
+    ECTextDocumentCtrl *_docCtrl;
+};
 
 #endif /* EDITORVIEW_H */
