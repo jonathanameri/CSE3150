@@ -132,74 +132,32 @@ bool ECTextDocumentCtrl :: Redo()
 {
     return histCmds.Redo();
 }
-bool ECTextDocumentCtrl :: ValidCursorAfterDelete(int x, int y) const
+
+void ECTextDocumentCtrl :: MergeLineCommand()
 {
-    if(doc.GetCursorX() == 0 )
-    {
-        if(doc.GetCursorY() == 0)
-            return false;
-        else
-            return true;
-    }
-    else
-        return true;
+    ECMergeLineCmd *pCmdMerge = new ECMergeLineCmd( this->doc, doc.GetCursorY() );
+    histCmds.ExecuteCmd( pCmdMerge );
 }
 
-void ECTextDocumentCtrl :: HandleInput(int code, char ch)
+void ECTextDocumentCtrl :: DeleteTextCommand()
 {
-    if(code == ARROW_LEFT){
-        if(doc.GetCursorX() - 1 >= 0){
-            doc.SetCursorX(doc.GetCursorX() - 1);
-        }
-    }
-    else if(code == ARROW_RIGHT){
-        if(doc.GetCursorX() + 1 <= doc.GetRowLen(doc.GetCursorY())){
-            doc.SetCursorX(doc.GetCursorX() + 1);
-        }
-    }
-    else if(code == ARROW_UP){
-        if(doc.GetCursorY() - 1 >= 0){
-            if(doc.GetRowLen(doc.GetCursorY() - 1) < doc.GetCursorX())
-                doc.SetCursorX(doc.GetRowLen(doc.GetCursorY() - 1));
-            doc.SetCursorY(doc.GetCursorY() - 1);
-        }
-    }
-    else if(code == ARROW_DOWN){
-        if(doc.GetCursorY() + 1 < doc.GetNumRows()){
-            if(doc.GetRowLen(doc.GetCursorY() + 1) < doc.GetCursorX())
-                doc.SetCursorX(doc.GetRowLen(doc.GetCursorY() + 1));
-            doc.SetCursorY(doc.GetCursorY() + 1);
-        }
-    }
-    else if(code == 127){ // code for backspace
-        if(doc.GetCursorX() == 0 )
-        {
-            if(doc.GetCursorY() == 0)
-                return;
-            else
-            {
-                ECMergeLineCmd *pCmdMergeLine = new ECMergeLineCmd( this->doc, doc.GetCursorY() );
-                histCmds.ExecuteCmd( pCmdMergeLine );
-            }
-        }
-        else{
-            ECDelTextCmd *pCmdDel = new ECDelTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX() - 1);
-            histCmds.ExecuteCmd( pCmdDel );
-        }
-    }
-    else if(code == 13)
-    {
-        ECNewLineCmd *pCmdNewLine = new ECNewLineCmd( this->doc, doc.GetCursorY() );
-        histCmds.ExecuteCmd( pCmdNewLine );
-    }
-    else {
-        ECInsTextCmd *pCmdIns = new ECInsTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX(), ch );
-        histCmds.ExecuteCmd( pCmdIns );
-        // InsertCharAt(doc.GetCursorY(), doc.GetCursorX(), ch);
-    }
+    ECDelTextCmd *pCmdDel = new ECDelTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX() - 1);
+    histCmds.ExecuteCmd( pCmdDel );
+}
+void ECTextDocumentCtrl :: NewLineCommand()
+{
+    ECNewLineCmd *pCmdNewLine = new ECNewLineCmd( this->doc, doc.GetCursorY() );
+    histCmds.ExecuteCmd( pCmdNewLine );
+}
+void ECTextDocumentCtrl :: InsertTextCommand(char ch)
+{
+    ECInsTextCmd *pCmdIns = new ECInsTextCmd( this->doc, doc.GetCursorY(), doc.GetCursorX(), ch );
+    histCmds.ExecuteCmd( pCmdIns );
 }
 
-std::vector<std::string> ECTextDocumentCtrl :: GetDocument(ECEditorView &view) const
+//********************************************************************************
+//Getters and Setters
+std::vector<std::string> ECTextDocumentCtrl :: GetDocument() const
 {
     return doc.GetDocument();
 }
@@ -211,6 +169,22 @@ int ECTextDocumentCtrl :: GetCursorX() const
 int ECTextDocumentCtrl :: GetCursorY() const
 {
     return doc.GetCursorY();
+}
+void ECTextDocumentCtrl :: SetCursorX(int x)
+{
+    doc.SetCursorX(x);
+}
+void ECTextDocumentCtrl :: SetCursorY(int y)
+{
+    doc.SetCursorY(y);
+}
+int ECTextDocumentCtrl :: GetRowLen(int row) const
+{
+    return doc.GetRowLen(row);
+}
+int ECTextDocumentCtrl :: GetNumRows() const
+{
+    return doc.GetNumRows();
 }
 
 

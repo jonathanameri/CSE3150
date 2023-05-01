@@ -2,7 +2,7 @@
 #include "ECTextViewImp.h"
 #include "ECCommand.h"
 #include "Document.h"
-#include "ECEditorView.h"
+#include "Observers.h"
 #include <iostream>
 
 using namespace std;
@@ -20,17 +20,16 @@ int main(int argc, char *argv[])
     string filename = argv[1];
 
 
+    //Initialize document and controller
+    //Model in MVC
     ECTextDocument doc;
-    
-
-    // string str1 = "CSE 3150";
-    // string str2 = "Jonathan Ameri";
-    // doc.InsertRow(0, str1);
-    // doc.InsertRow(1, str2);
+    //Controller in MVC
     ECTextDocumentCtrl docCtrl(doc);
 
-
+    //View in MVC
     ECTextViewImp wndTest;
+
+    //EditorView is in charge of creating and attaching all observers
     ECEditorView *editorView = new ECEditorView(&wndTest, &docCtrl);
 
     wndTest.AddStatusRow("Edit Mode", filename , true);

@@ -4,7 +4,7 @@
 #include <vector>
 #include "ECCommand.h"
 #include "ECTextViewImp.h"
-#include "ECEditorView.h"
+#include "Observers.h"
 
 class ECTextDocument;
 class ECEditorView;
@@ -88,11 +88,20 @@ public:
     void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
     bool Undo();                                                            // undo any change you did to the text
     bool Redo();                                                            // redo the change to the text
-    bool ValidCursorAfterDelete(int x, int y) const;                                                 // check if the cursor is valid
     void HandleInput(int code, char ch);                                         // handle input from view
-    std::vector<std::string> GetDocument(ECEditorView &view) const;                             // update the view
+    void MergeLineCommand();
+    void DeleteTextCommand();
+    void NewLineCommand();
+    void InsertTextCommand(char ch);
+
+    //Getters and Setters
+    std::vector<std::string> GetDocument() const;                             // update the view
     int GetCursorX() const; 
     int GetCursorY() const; 
+    void SetCursorX(int x);
+    void SetCursorY(int y);
+    int GetRowLen(int row) const;
+    int GetNumRows() const;
 private:
     ECTextDocument &doc;
     ECCommandHistory histCmds;
