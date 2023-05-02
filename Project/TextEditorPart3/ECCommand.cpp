@@ -16,23 +16,31 @@ ECCommandHistory :: ~ECCommandHistory()
 
 bool ECCommandHistory :: Undo()
 {
-    if( posCurrCmd < 0  )
-    {
-        return false;
+    if (posCheckpoint < 0) return false;
+    for(int i = 0; i < checkpoints[posCheckpoint]; i++){
+        if( posCurrCmd < 0  )
+        {
+            return false;
+        }
+        listCommands[posCurrCmd]->UnExecute();
+        --posCurrCmd;
     }
-    listCommands[posCurrCmd]->UnExecute();
-    --posCurrCmd;
+    --posCheckpoint;
     return true;
 }
 
 bool ECCommandHistory :: Redo()
 {
-    if( posCurrCmd >= (int)listCommands.size()-1  )
-    {
-        return false;
+    if(posCheckpoint >= (int)checkpoints.size()-1) return false;
+    ++posCheckpoint;
+    for(int i = 0; i < checkpoints[posCheckpoint]; i++){
+        if( posCurrCmd >= (int)listCommands.size()-1  )
+        {
+            return false;
+        }
+        ++posCurrCmd;
+        listCommands[posCurrCmd]->Execute();
     }
-    ++posCurrCmd;
-    listCommands[posCurrCmd]->Execute();
     return true;
 }
 
@@ -49,11 +57,22 @@ void ECCommandHistory :: ExecuteCmd( ECCommand *pCmd )
             listCommands.pop_back();
         }
     }
+    
     listCommands.push_back(pCmd);
     ++posCurrCmd;
 }
 
 void ECCommandHistory:: AddCheckpoint(int x){
+    if(posCheckpoint >= -1)
+    {
+        int szList = checkpoints.size();
+        for(unsigned int i=posCheckpoint+1; i<szList; ++i)
+        {
+            checkpoints.pop_back();
+        }
+    }
+
     checkpoints.push_back(x);
+    posCheckpoint++;
 }
 

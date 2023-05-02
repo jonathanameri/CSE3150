@@ -1,10 +1,14 @@
 #ifndef Document_h
 #define Document_h
 
-#include <vector>
 #include "ECCommand.h"
 #include "ECTextViewImp.h"
 #include "Observers.h"
+#include <vector>
+#include <iostream>
+#include <cctype>
+#include <fstream>
+#include <string>
 
 class ECTextDocument;
 class ECEditorView;
@@ -20,7 +24,7 @@ class ECTextDocument;
 class ECNewLineCmd : public ECCommand
 {
 public:
-    ECNewLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
+    ECNewLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn), cursorX(-1),cursorY(-1) {} ;
     void Execute();
     void UnExecute();
 private:
@@ -63,6 +67,7 @@ private:
     int row;
     int posIns;
     char charIns;
+    int cursorX;
 };
 
 // **********************************************************
@@ -80,6 +85,7 @@ private:
     int rowDel;
     int posDel;
     std::vector<char> listCharsDel;
+    int cursorX;
 };
 
 
@@ -88,14 +94,12 @@ private:
 class ECTextDocumentCtrl
 {
 public:
-    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename) : doc(docIn), _view(view), _filename(filename), mode(0), numCommands(0) {};     // conroller constructor takes the document as input
+    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename);     // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
     void InsertCharAt(int row, int pos, char charIns);    // insert a list of characters starting at position
     void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
-    bool Undo();                                                            // undo any change you did to the text
-    bool Redo();                                                            // redo the change to the text
-    //outdated HandleInput Function
-    void HandleInput(int code, char ch);                                         // handle input from view
+    bool Undo();                                      // undo any change you did to the text
+    bool Redo();                                              // redo the change to the text
     
     //Commands needed to update the model
     void MergeLineCommand();

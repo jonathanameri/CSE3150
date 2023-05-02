@@ -1,6 +1,4 @@
 #include "Document.h"
-#include <iostream>
-#include <cctype>
 
 using namespace std;
 
@@ -22,15 +20,15 @@ using namespace std;
 void ECNewLineCmd :: Execute()
 {
     //Check if mid line or at end of line
-    cursorX = doc.GetCursorX();
-    cursorY = doc.GetCursorY();
-    oldLine = doc.GetRow(cursorY);
+    if(cursorX == -1) cursorX = doc.GetCursorX();
+    if(cursorY == -1) cursorY = doc.GetCursorY();
+    oldLine = doc.GetRow(row);
     if (cursorX == doc.GetRowLen(row))
     {
         //Insert new line
         doc.InsertRow( row + 1, "" );
         doc.SetCursorX(0);
-        doc.SetCursorY(cursorY + 1);
+        doc.SetCursorY(row + 1);
     }
     else{
         //Split line
@@ -40,7 +38,7 @@ void ECNewLineCmd :: Execute()
         doc.SetRow(row, str1);
         doc.InsertRow(row + 1, str2);
         doc.SetCursorX(0);
-        doc.SetCursorY(cursorY + 1);
+        doc.SetCursorY(row + 1);
     }
 }
 
@@ -67,7 +65,6 @@ void ECMergeLineCmd :: Execute()
     doc.RemoveRow(row);
     doc.SetCursorX(str1.length());
     doc.SetCursorY(row - 1);
-    
 }
 
 void ECMergeLineCmd :: UnExecute()
@@ -87,12 +84,14 @@ void ECMergeLineCmd :: UnExecute()
 void ECInsTextCmd :: Execute()
 {
     // insert to document
+    cursorX = doc.GetCursorX();
     doc.InsertCharAt( row, posIns, charIns );
 }
 void ECInsTextCmd :: UnExecute()
 {
     // undo (i.e. remove the inserted characters)
     doc.RemoveCharAt( row, posIns );
+    doc.SetCursorX(cursorX);
 }
 
 
@@ -104,6 +103,7 @@ ECDelTextCmd :: ~ECDelTextCmd()
 }
 void ECDelTextCmd :: Execute()
 {
+    cursorX = doc.GetCursorX();
     char ch = doc.GetCharAt(rowDel, posDel);
     listCharsDel.push_back(ch);
     doc.RemoveCharAt( rowDel, posDel );
@@ -116,23 +116,50 @@ void ECDelTextCmd :: UnExecute()
         doc.InsertCharAt( rowDel, posDel+i, listCharsDel[i] );
     }
     listCharsDel.clear();
+    doc.SetCursorX(cursorX);
 }
 
 
 
 // **********************************************************
 // Controller for text document
-ECTextDocumentCtrl :: ~ECTextDocumentCtrl(){}
-void ECTextDocumentCtrl :: InsertCharAt(int row, int pos, char charIns)
+
+ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename) : doc(docIn), _view(view), _filename(filename), mode(0), numCommands(0)      // conroller constructor takes the document as input
 {
-    ECInsTextCmd *pCmdIns = new ECInsTextCmd( this->doc, row, pos, charIns );
-    histCmds.ExecuteCmd( pCmdIns );
+    // //Create the file if it doesnt exist
+    // ofstream a_file ( filename);
+    // a_file.close();
+
+    //Read the file
+    string line;
+    ifstream myfile (filename);
+    if (myfile.is_open())
+    {
+        while ( getline (myfile,line) )
+        {
+            doc.InsertRow(doc.GetNumRows()-1, line);
+        }
+        myfile.close();
+        doc.RemoveRow(doc.GetNumRows()-1);
+    }
+
+    SetCursorX(0);
+    SetCursorY(0);
+    UpdateView();
+    // else return -1; 
 }
-void ECTextDocumentCtrl :: RemoveCharAt(int row, int pos)
-{
-    ECDelTextCmd *pCmdDel = new ECDelTextCmd( this->doc, row, pos);
-    histCmds.ExecuteCmd( pCmdDel );
+ECTextDocumentCtrl :: ~ECTextDocumentCtrl(){
+    // Save the document to the file
+    ofstream myfile;
+    myfile.open (_filename);
+    vector<string> document = GetDocument();
+    for(int i = 0; i < document.size(); i++){
+        myfile << document[i] << endl;
+    }
+    myfile.close();
+
 }
+
 bool ECTextDocumentCtrl :: Undo()
 {
     return histCmds.Undo();
@@ -226,7 +253,7 @@ void ECTextDocumentCtrl :: SetMode(int newMode)
     if(newMode == 0){
         _view->ClearStatusRows();
         _view->AddStatusRow("Command Mode", _filename, true);
-        histCmds.AddCheckpoint(numCommands);
+        if(numCommands > 0) histCmds.AddCheckpoint(numCommands);
         numCommands = 0;
     }
     else if (newMode == 1){

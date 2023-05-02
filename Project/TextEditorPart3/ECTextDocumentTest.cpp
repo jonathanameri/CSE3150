@@ -4,6 +4,8 @@
 #include "Document.h"
 #include "Observers.h"
 #include <iostream>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -14,15 +16,13 @@ int main(int argc, char *argv[])
     if (argc != 2){
         cout << "Usage: " << argv[0] << " <filename>" << endl;
         return 1;
-        exit(1);
     }
-
     string filename = argv[1];
-
 
     //Initialize document and controller
     //Model in MVC
     ECTextDocument doc;
+
     //View in MVC
     ECTextViewImp wndTest;
     //Controller in MVC
