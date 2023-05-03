@@ -79,6 +79,10 @@ void ECCommandHistory:: AddCheckpoint(int x){
 
 
 
+// ****************************************************************************
+// COMMANDS
+// ****************************************************************************
+
 // **********************************************************
 // Command for new line
 void ECNewLineCmd :: Execute()
@@ -91,8 +95,8 @@ void ECNewLineCmd :: Execute()
     {
         //Insert new line
         doc.InsertRow( row + 1, "" );
-        doc.SetCursorX(0);
-        doc.SetCursorY(row + 1);
+        // doc.SetCursorX(0);
+        // doc.SetCursorY(row + 1);
     }
     else{
         //Split line
@@ -101,8 +105,8 @@ void ECNewLineCmd :: Execute()
         string str2 = str.substr(cursorX, str.length() - cursorX);
         doc.SetRow(row, str1);
         doc.InsertRow(row + 1, str2);
-        doc.SetCursorX(0);
-        doc.SetCursorY(row + 1);
+        // doc.SetCursorX(0);
+        // doc.SetCursorY(row + 1);
     }
 }
 
@@ -111,8 +115,8 @@ void ECNewLineCmd :: UnExecute()
     // undo (i.e. remove the inserted characters)
     doc.SetRow(row, oldLine);
     doc.RemoveRow(row + 1);
-    doc.SetCursorX(cursorX);
-    doc.SetCursorY(cursorY);
+    // doc.SetCursorX(cursorX);
+    // doc.SetCursorY(cursorY);
 }
 
 
@@ -127,8 +131,8 @@ void ECMergeLineCmd :: Execute()
     string str = str1 + str2;
     doc.SetRow(row - 1, str);
     doc.RemoveRow(row);
-    doc.SetCursorX(str1.length());
-    doc.SetCursorY(row - 1);
+    // doc.SetCursorX(str1.length());
+    // doc.SetCursorY(row - 1);
 }
 
 void ECMergeLineCmd :: UnExecute()
@@ -138,8 +142,8 @@ void ECMergeLineCmd :: UnExecute()
     // string str2 = str.substr(lenLine, str.length() - lenLine);
     doc.SetRow(row-1, str1);
     doc.InsertRow(row, str2);
-    doc.SetCursorX(cursorX);
-    doc.SetCursorY(cursorY);
+    // doc.SetCursorX(cursorX);
+    // doc.SetCursorY(cursorY);
 }
 
 
@@ -155,7 +159,7 @@ void ECInsTextCmd :: UnExecute()
 {
     // undo (i.e. remove the inserted characters)
     doc.RemoveCharAt( row, posIns );
-    doc.SetCursorX(cursorX);
+    // doc.SetCursorX(cursorX);
 }
 
 
@@ -180,6 +184,6 @@ void ECDelTextCmd :: UnExecute()
         doc.InsertCharAt( rowDel, posDel+i, listCharsDel[i] );
     }
     listCharsDel.clear();
-    doc.SetCursorX(cursorX);
+    // doc.SetCursorX(cursorX);
 }
 

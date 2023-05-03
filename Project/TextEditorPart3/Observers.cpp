@@ -46,18 +46,17 @@ void BackspaceObserver :: Update(){
     if(_docCtrl->GetMode() == 1){
         int code = _subject->GetPressedKey();
         if(code == 127){ // code for backspace
-            if(_docCtrl->GetCursorX() == 0 )
-            {
-                if(_docCtrl->GetCursorY() == 0)
-                    return;
-                else
-                {
-                    _docCtrl->MergeLineCommand();
-                }
-            }
-            else{
-                _docCtrl->DeleteTextCommand();
-            }
+            _docCtrl->DeleteTextCommand();
+            // if(_docCtrl->GetCursorX() == 0 )
+            // {
+            //     if(_docCtrl->GetCursorY() == 0)
+            //         return;
+            //     else
+            //         _docCtrl->MergeLineCommand();
+            // }
+            // else{
+            //     _docCtrl->DeleteTextCommand();
+            // }
             _docCtrl->UpdateView();
         }
     }    
