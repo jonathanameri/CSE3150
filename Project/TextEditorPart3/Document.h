@@ -14,79 +14,9 @@ class ECTextDocument;
 class ECEditorView;
 class ECTextDocument;
 
-//***********************************************************
-// Checkpoint command
 
+using namespace std;
 
-
-// **********************************************************
-// Command for new line
-class ECNewLineCmd : public ECCommand
-{
-public:
-    ECNewLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn), cursorX(-1),cursorY(-1) {} ;
-    void Execute();
-    void UnExecute();
-private:
-    ECTextDocument &doc;
-    int row;
-    int cursorX;
-    int cursorY;
-    std::string oldLine;
-};
-
-
-// **********************************************************
-// Command for merging lines
-class ECMergeLineCmd : public ECCommand
-{
-public:
-    ECMergeLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
-    void Execute();
-    void UnExecute();
-private:
-    ECTextDocument &doc;
-    int row;
-    std::string str1;
-    std::string str2;
-    int cursorX;
-    int cursorY;
-};
-
-// **********************************************************
-// Command for insertion
-class ECInsTextCmd : public ECCommand
-{
-public:
-    ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns ) : doc(docIn), row(row), posIns(posInsIn), charIns(charIns) {};
-    void Execute();
-    void UnExecute();
-    
-private:
-    ECTextDocument &doc;
-    int row;
-    int posIns;
-    char charIns;
-    int cursorX;
-};
-
-// **********************************************************
-// Command for deletion
-class ECDelTextCmd : public ECCommand
-{
-public:
-    ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn) : doc(docIn), rowDel(rowDel), posDel(posDelIn) {} ;
-    ~ECDelTextCmd();
-    virtual void Execute();
-    virtual void UnExecute();
-    
-private:
-    ECTextDocument &doc;
-    int rowDel;
-    int posDel;
-    std::vector<char> listCharsDel;
-    int cursorX;
-};
 
 
 // **********************************************************
@@ -94,7 +24,7 @@ private:
 class ECTextDocumentCtrl
 {
 public:
-    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename);     // conroller constructor takes the document as input
+    ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, string filename);     // conroller constructor takes the document as input
     virtual ~ECTextDocumentCtrl();
     void InsertCharAt(int row, int pos, char charIns);    // insert a list of characters starting at position
     void RemoveCharAt(int row, int pos);                            // remove a segment of characters  of lenToRemove starting from pos                          // Lowercase the text of lenToLoer starting from pos
@@ -111,7 +41,7 @@ public:
     void UpdateView();
 
     //Getters and Setters
-    std::vector<std::string> GetDocument() const;                             // update the view
+    vector<string> GetDocument() const;                             // update the view
     int GetCursorX() const; 
     int GetCursorY() const; 
     void SetCursorX(int x);
@@ -125,7 +55,7 @@ private:
     ECTextViewImp *_view;
     ECCommandHistory histCmds;
     int mode;   //0 for command mode, 1 for insert mode
-    std::string _filename;
+    string _filename;
     int numCommands;
 };
 
@@ -135,16 +65,32 @@ private:
 class ECTextDocument
 {
 public:
+    struct Row{
+        string text;
+        bool wrapped;
+    };
+
     ECTextDocument();
     virtual ~ECTextDocument();
     ECTextDocumentCtrl &GetCtrl();          // return document controller
-    void InsertRow(int row, const std::string &str);    // insert a row of text
-    int GetNumRows() const { return listRows.size(); }
-    int GetRowLen(int row) const;
-    std::string GetRow(int row) const;
-    void SetRow(int row, std::string &str);
+
+
+
+//****************************************************************************************
+//TEMPORAILY IMPLEMENTING THESE FOR TESTING PURPOSES
+//****************************************************************************************
+    void InsertRow(int row, const string &str);    // insert a row of text
+    void SetRow(int row, string &str);
     void RemoveRow(int row);
     char GetCharAt(int row, int pos) const;          // get char at current position
+
+
+
+
+    void NewLine(int row, int pos, bool isWrapped = false);
+    int GetNumRows() const;
+    int GetRowLen(int row) const;
+    string GetRow(int row) const;
     void InsertCharAt(int row, int pos, char ch);    // insert a single char at position
     void RemoveCharAt(int row, int pos);             // erase a single char at position
 
@@ -153,14 +99,19 @@ public:
     void SetCursorX(int x) { cursorX = x; }
     void SetCursorY(int y) { cursorY = y; }
 
-    void Dump() const;
-    std::vector<std::string> GetDocument() const;
+    int GetMaxLen() const { return MAX_LINE_LEN; }
+    bool IsRowWrapped(int row) const { return listRows[row].wrapped; }
+
+    // void Dump() const;
+    vector<string> GetDocument() const;
     
 private:
-    std::vector<std::string> listRows;
+    // vector<string> listRows;
     int cursorX;
     int cursorY;
-    // std::map<int, std::map<int, std::pair<int, TEXT_COLOR> > > clrTextInfo;
+    int MAX_LINE_LEN = 80;
+    vector<Row> listRows;
+    // map<int, map<int, pair<int, TEXT_COLOR> > > clrTextInfo;
 
 };
 

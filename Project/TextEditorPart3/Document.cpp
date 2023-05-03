@@ -1,130 +1,9 @@
 #include "Document.h"
 
-using namespace std;
-
-//***********************************************************
-// Checkpoint command
-// void ECCheckpoint :: Execute()
-// {
-//     //Do nothing
-//     return;
-// }
-// void ECCheckpoint :: UnExecute()
-// {
-//     //Do nothing
-//     return;
-// }
-
-// **********************************************************
-// Command for new line
-void ECNewLineCmd :: Execute()
-{
-    //Check if mid line or at end of line
-    if(cursorX == -1) cursorX = doc.GetCursorX();
-    if(cursorY == -1) cursorY = doc.GetCursorY();
-    oldLine = doc.GetRow(row);
-    if (cursorX == doc.GetRowLen(row))
-    {
-        //Insert new line
-        doc.InsertRow( row + 1, "" );
-        doc.SetCursorX(0);
-        doc.SetCursorY(row + 1);
-    }
-    else{
-        //Split line
-        string str = doc.GetRow(row);
-        string str1 = str.substr(0, cursorX);
-        string str2 = str.substr(cursorX, str.length() - cursorX);
-        doc.SetRow(row, str1);
-        doc.InsertRow(row + 1, str2);
-        doc.SetCursorX(0);
-        doc.SetCursorY(row + 1);
-    }
-}
-
-void ECNewLineCmd :: UnExecute()
-{
-    // undo (i.e. remove the inserted characters)
-    doc.SetRow(row, oldLine);
-    doc.RemoveRow(row + 1);
-    doc.SetCursorX(cursorX);
-    doc.SetCursorY(cursorY);
-}
-
-
-// **********************************************************
-// Command for merging lines
-void ECMergeLineCmd :: Execute()
-{
-    cursorX = doc.GetCursorX();
-    cursorY = doc.GetCursorY();
-    str1 = doc.GetRow(row-1);
-    str2 = doc.GetRow(row);
-    string str = str1 + str2;
-    doc.SetRow(row - 1, str);
-    doc.RemoveRow(row);
-    doc.SetCursorX(str1.length());
-    doc.SetCursorY(row - 1);
-}
-
-void ECMergeLineCmd :: UnExecute()
-{
-    // string str = doc.GetRow(row-1);
-    // string str1 = str.substr(0, lenLine);
-    // string str2 = str.substr(lenLine, str.length() - lenLine);
-    doc.SetRow(row-1, str1);
-    doc.InsertRow(row, str2);
-    doc.SetCursorX(cursorX);
-    doc.SetCursorY(cursorY);
-}
-
-
-// **********************************************************
-// Command for insertion
-void ECInsTextCmd :: Execute()
-{
-    // insert to document
-    cursorX = doc.GetCursorX();
-    doc.InsertCharAt( row, posIns, charIns );
-}
-void ECInsTextCmd :: UnExecute()
-{
-    // undo (i.e. remove the inserted characters)
-    doc.RemoveCharAt( row, posIns );
-    doc.SetCursorX(cursorX);
-}
-
-
-// **********************************************************
-// Command for deletion
-ECDelTextCmd :: ~ECDelTextCmd()
-{
-    listCharsDel.clear();
-}
-void ECDelTextCmd :: Execute()
-{
-    cursorX = doc.GetCursorX();
-    char ch = doc.GetCharAt(rowDel, posDel);
-    listCharsDel.push_back(ch);
-    doc.RemoveCharAt( rowDel, posDel );
-}
-void ECDelTextCmd :: UnExecute()
-{
-    // undo: that is, adding the deleted text back
-    for(unsigned int i=0; i<listCharsDel.size(); ++i)
-    {
-        doc.InsertCharAt( rowDel, posDel+i, listCharsDel[i] );
-    }
-    listCharsDel.clear();
-    doc.SetCursorX(cursorX);
-}
-
-
-
 // **********************************************************
 // Controller for text document
 
-ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, std::string filename) : doc(docIn), _view(view), _filename(filename), mode(0), numCommands(0)      // conroller constructor takes the document as input
+ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *view, string filename) : doc(docIn), _view(view), _filename(filename), mode(0), numCommands(0)      // conroller constructor takes the document as input
 {
     // //Create the file if it doesnt exist
     // ofstream a_file ( filename);
@@ -137,10 +16,14 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
     {
         while ( getline (myfile,line) )
         {
-            doc.InsertRow(doc.GetNumRows()-1, line);
+            for(int i = 0; i < line.length(); i++){
+                doc.InsertCharAt(doc.GetNumRows()-1, doc.GetRowLen(doc.GetNumRows()-1), line[i]);
+            }
+            // doc.InsertRow(doc.GetNumRows()-1, line);
         }
         myfile.close();
-        doc.RemoveRow(doc.GetNumRows()-1);
+
+        // doc.RemoveRow(doc.GetNumRows()-1);
     }
 
     SetCursorX(0);
@@ -213,7 +96,7 @@ void ECTextDocumentCtrl :: InsertTextCommand(char ch)
 
 //********************************************************************************
 //Getters and Setters
-std::vector<std::string> ECTextDocumentCtrl :: GetDocument() const
+vector<string> ECTextDocumentCtrl :: GetDocument() const
 {
     return doc.GetDocument();
 }
@@ -266,63 +149,158 @@ void ECTextDocumentCtrl :: SetMode(int newMode)
 
 // **********************************************************
 //ECTextDocument
-ECTextDocument :: ECTextDocument() : cursorX(0), cursorY(0){ listRows.push_back(""); }
+ECTextDocument :: ECTextDocument() : cursorX(0), cursorY(0){ listRows.push_back( Row{"", false}); }
 ECTextDocument :: ~ECTextDocument()
 {
     listRows.clear();
 }
-void ECTextDocument :: InsertRow(int row, const std::string &str)
+
+int ECTextDocument :: GetNumRows() const { return listRows.size(); }
+int ECTextDocument :: GetRowLen(int row) const { return listRows[row].text.size(); }
+
+
+//TODO maybe change this so that GetRow returns the wrapped text from next line(s)
+string ECTextDocument :: GetRow(int row) const
 {
-    listRows.insert( listRows.begin()+row, str );
+    // if(GetNumRows()-1 >= row+1 && IsRowWrapped(row+1)){
+    //     return listRows[row].text + GetRow(row+1);
+    // }
+    return listRows[row].text;
 }
-int ECTextDocument :: GetRowLen(int row) const
+
+//Representing Enter key being hit
+void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
+    //No matter what there will be a new line created
+    listRows.insert( listRows.begin()+row, Row{"", isWrapped} );
+
+
+    if(pos < GetRowLen(row)){
+        //Split the string
+        string str1 = listRows[row].text.substr(0,pos);
+        string str2 = listRows[row].text.substr(pos);
+        
+        //Erase old line
+        for(int i = GetRowLen(row) - 1; i >= 0 ; i--){
+            RemoveCharAt(row, i-1);
+        }
+
+        //Insert new lines
+        for(int i = 0; i < str1.size(); i++){
+            InsertCharAt(row, i, str1[i]);
+        }
+        for(int i = 0; i < str2.size(); i++){
+            InsertCharAt(row+1, i, str2[i]);
+        }
+        // listRows.insert( listRows.begin()+row+1, listRows[row+1].substr(pos) );
+        // listRows[row] = listRows[row].substr(0, pos);
+    }
+    SetCursorX(0);
+    SetCursorY(row+1);
+    // listRows.insert( listRows.begin()+row, listRows[row].substr(pos) );
+}
+
+
+//****************************************************************************************
+//TEMPORAILY IMPLEMENTING THESE FOR TESTING PURPOSES
+//****************************************************************************************
+
+void ECTextDocument :: InsertRow(int row, const string &str)
 {
-    return listRows[row].size();
-}
-std::string ECTextDocument :: GetRow(int row) const
-{
-    return listRows[row];
-}
-void ECTextDocument :: SetRow(int row, std::string &str){
-    listRows[row] = str;
+    NewLine(row, 0, false);
+    for(int i = 0; i < str.size(); i++){
+        InsertCharAt(row, i, str[i]);
+    }
+    // listRows.insert( listRows.begin()+row, str );
 }
 void ECTextDocument :: RemoveRow(int row){
-    listRows.erase( listRows.begin()+row );
+    for(int i = GetRowLen(row) - 1; i >= 0 ; i--){
+        RemoveCharAt(row, i);
+    }
 }
+void ECTextDocument :: SetRow(int row, string &str){
+    for(int i = GetRowLen(row) - 1; i >= 0 ; i--){
+        RemoveCharAt(row, i);
+    }
+    for(int i = 0; i < str.size(); i++){
+        InsertCharAt(row, i, str[i]);
+    }
+}
+
+
 char ECTextDocument :: GetCharAt(int row, int pos) const
 {
-    return listRows[row][pos];
+    return listRows[row].text[pos];
 }
 void ECTextDocument :: InsertCharAt(int row, int pos, char ch)
 {
-    // insert at a postion
-    listRows[row].insert( listRows[row].begin()+pos, ch );
+    //Simply insert the character
+    listRows[row].text.insert( listRows[row].text.begin()+pos, ch ); 
+
+    //Check if the line is now too long
+    if(GetRowLen(row) > MAX_LINE_LEN){
+        if(GetNumRows()-1 >= row+1){
+            if(!IsRowWrapped(row+1)){
+                NewLine(row, MAX_LINE_LEN, true);
+            }
+            InsertCharAt(row+1, 0, listRows[row].text[MAX_LINE_LEN]);
+            listRows[row].text.erase( listRows[row].text.begin()+MAX_LINE_LEN );
+        }
+        else{
+            NewLine(row, MAX_LINE_LEN, true);
+            InsertCharAt(row+1, 0, listRows[row].text[MAX_LINE_LEN]);
+            listRows[row].text.erase( listRows[row].text.begin()+MAX_LINE_LEN );
+        }
+    }
+
+    //cursor is always increased no matter what happened
     cursorX++;
 }
 void ECTextDocument :: RemoveCharAt(int row, int pos)
 {
-    listRows[row].erase( listRows[row].begin()+pos );
+    //If at beginning of a line
+    if(cursorX == 0 && cursorY > 0){
+        cursorY--;
+        cursorX = GetRowLen(cursorY);
+
+        //Move text from current line to previous line
+        listRows[cursorY].text += listRows[cursorY+1].text;
+        listRows.erase( listRows.begin()+cursorY+1 );
+
+        //Check if the previous line is now too long
+        if(GetRowLen(cursorY) > MAX_LINE_LEN){
+            if(GetNumRows()-1 >= cursorY+1){
+                if(!IsRowWrapped(cursorY+1)){
+                    NewLine(cursorY, MAX_LINE_LEN, true);
+                }
+                for(int i = MAX_LINE_LEN; i < GetRowLen(cursorY); i++){
+                    InsertCharAt(cursorY+1, i-MAX_LINE_LEN, listRows[cursorY].text[i]);
+                }
+                listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN, listRows[cursorY].text.end() );
+                // InsertCharAt(row+1, 0, listRows[row].text[MAX_LINE_LEN]);
+                // listRows[row].text.erase( listRows[row].text.begin()+MAX_LINE_LEN );
+            }
+            else{
+                NewLine(row, MAX_LINE_LEN, true);
+                for(int i = MAX_LINE_LEN; i < GetRowLen(cursorY); i++){
+                    InsertCharAt(cursorY+1, i-MAX_LINE_LEN, listRows[cursorY].text[i]);
+                }
+                listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN, listRows[cursorY].text.end() );
+                // InsertCharAt(row+1, 0, listRows[row].text[MAX_LINE_LEN]);
+                // listRows[row].text.erase( listRows[row].text.begin()+MAX_LINE_LEN );
+            }
+        }
+        cursorX--;
+        return;
+    }
+    listRows[row].text.erase( listRows[row].text.begin()+pos );
     cursorX--;
 }
-void ECTextDocument :: Dump() const
-{
-    cout << "*********************************" << endl;
-    for(unsigned int i=0; i<listRows.size(); ++i)
-    {
-        cout <<" "<<i << "|";
-        for(unsigned int j=0; j<=listRows[i].size(); ++j)
-        {
-            if(j == cursorX && i == cursorY)
-                cout << "#";
-            cout << listRows[i][j];
-            
-        }
-        cout << endl;
-    }
-    cout << "*********************************" << endl;
-}
 
-std::vector<std::string> ECTextDocument :: GetDocument() const
+vector<string> ECTextDocument :: GetDocument() const
 {
-    return listRows;
+    vector<string> doc;
+    for(int i = 0; i < GetNumRows(); i++){
+        doc.push_back(GetRow(i));
+    }
+    return doc;
 }

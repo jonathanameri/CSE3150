@@ -2,6 +2,11 @@
 #define ECCommand_h
 
 #include <vector>
+#include <string>
+using namespace std;
+
+class ECTextDocument;
+class ECTextDocumentCtrl;
 
 // ******************************************************
 // Implement command design pattern
@@ -28,11 +33,84 @@ public:
     void AddCheckpoint(int x);
     
 private:
-    std::vector<ECCommand *> listCommands;
+    vector<ECCommand *> listCommands;
     int posCurrCmd;
-    std::vector<int> checkpoints;
+    vector<int> checkpoints;
     int posCheckpoint;
 };
+
+
+
+// **********************************************************
+// Command for new line
+class ECNewLineCmd : public ECCommand
+{
+public:
+    ECNewLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn), cursorX(-1),cursorY(-1) {} ;
+    void Execute();
+    void UnExecute();
+private:
+    ECTextDocument &doc;
+    int row;
+    int cursorX;
+    int cursorY;
+    string oldLine;
+};
+
+
+// **********************************************************
+// Command for merging lines
+class ECMergeLineCmd : public ECCommand
+{
+public:
+    ECMergeLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
+    void Execute();
+    void UnExecute();
+private:
+    ECTextDocument &doc;
+    int row;
+    string str1;
+    string str2;
+    int cursorX;
+    int cursorY;
+};
+
+// **********************************************************
+// Command for insertion
+class ECInsTextCmd : public ECCommand
+{
+public:
+    ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns ) : doc(docIn), row(row), posIns(posInsIn), charIns(charIns) {};
+    void Execute();
+    void UnExecute();
+    
+private:
+    ECTextDocument &doc;
+    int row;
+    int posIns;
+    char charIns;
+    int cursorX;
+};
+
+// **********************************************************
+// Command for deletion
+class ECDelTextCmd : public ECCommand
+{
+public:
+    ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn) : doc(docIn), rowDel(rowDel), posDel(posDelIn) {} ;
+    ~ECDelTextCmd();
+    virtual void Execute();
+    virtual void UnExecute();
+    
+private:
+    ECTextDocument &doc;
+    int rowDel;
+    int posDel;
+    vector<char> listCharsDel;
+    int cursorX;
+};
+
+
 
 
 #endif /* ECCommand_h */
