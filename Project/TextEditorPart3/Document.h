@@ -90,7 +90,7 @@ public:
 
 
 
-    void NewLine(int row, int pos, bool isWrapped = false);
+    void NewLine(int row, int pos, bool isWrapped);
     int GetNumRows() const;
     int GetRowLen(int row) const;
     string GetRow(int row) const;

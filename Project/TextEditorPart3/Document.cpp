@@ -244,7 +244,9 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
 
     //No matter what there will be a new line created
 
+    //TODO change the inserted line to check if it should be wrapped without assuming false (This is the case if its a multi wrapped line)
     listRows.insert( listRows.begin()+cursorY, Row{"", false} );
+    // listRows.insert( listRows.begin()+cursorY, Row{"", isWrapped} );
     listRows[cursorY+1].wrapped = isWrapped;
 
     cursorY++;
@@ -264,12 +266,13 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
         }
 
         //Insert new lines
-        for(int i = 0; i < str1.size(); i++){
-            InsertCharAt(lineToSplit-1, i, str1[i]);
-        }
         for(int i = 0; i < str2.size(); i++){
             InsertCharAt(lineToSplit, i, str2[i]);
         }
+        for(int i = 0; i < str1.size(); i++){
+            InsertCharAt(lineToSplit-1, i, str1[i]);
+        }
+        
         // listRows.insert( listRows.begin()+row+1, listRows[row+1].substr(pos) );
         // listRows[row] = listRows[row].substr(0, pos);
     }
@@ -311,14 +314,23 @@ void ECTextDocument :: InsertCharAt(int row, int pos, char ch)
             }
             //IF THE NEXT LINE IS ALREADY WRAPPED
             else{
-                InsertCharAt(cursorY+1, 0, listRows[cursorY-1].text[MAX_LINE_LEN]);
-                listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN );
+                NewLine(cursorY, MAX_LINE_LEN, true);
+                cursorY++;
+                RemoveCharAt(cursorY+1, 0);
+                // cursorX++;
+                SetCursorX(GetRowLen(cursorY));
+                
+                // InsertCharAt(cursorY+1, 0, listRows[cursorY].text[MAX_LINE_LEN]);
+                // listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN );
             }
             
         }
         else{
             NewLine(cursorY, MAX_LINE_LEN, true);
-            cursorX++;
+            cursorY++;
+            SetCursorX(GetRowLen(cursorY));
+            // cursorX++;
+            
             // NewLine(cursorY+1, 0, true);
             // InsertCharAt(cursorY, 0, listRows[cursorY-1].text[MAX_LINE_LEN]);
             // listRows[cursorY-1].text.erase( listRows[cursorY-1].text.begin()+MAX_LINE_LEN );
