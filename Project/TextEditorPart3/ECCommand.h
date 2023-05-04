@@ -55,25 +55,26 @@ private:
     int cursorX;
     int cursorY;
     string oldLine;
+    bool endOfLine;
 };
 
 
 // **********************************************************
 // Command for merging lines
-class ECMergeLineCmd : public ECCommand
-{
-public:
-    ECMergeLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
-    void Execute();
-    void UnExecute();
-private:
-    ECTextDocument &doc;
-    int row;
-    string str1;
-    string str2;
-    int cursorX;
-    int cursorY;
-};
+// class ECMergeLineCmd : public ECCommand
+// {
+// public:
+//     ECMergeLineCmd( ECTextDocument &docIn, int rowIn ) : doc(docIn), row(rowIn) {} ;
+//     void Execute();
+//     void UnExecute();
+// private:
+//     ECTextDocument &doc;
+//     int row;
+//     string str1;
+//     string str2;
+//     int cursorX;
+//     int cursorY;
+// };
 
 // **********************************************************
 // Command for insertion
@@ -98,7 +99,7 @@ class ECDelTextCmd : public ECCommand
 {
 public:
     ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn) : doc(docIn), rowDel(rowDel), posDel(posDelIn) {} ;
-    ~ECDelTextCmd();
+    // ~ECDelTextCmd();
     virtual void Execute();
     virtual void UnExecute();
     
@@ -106,8 +107,11 @@ private:
     ECTextDocument &doc;
     int rowDel;
     int posDel;
-    vector<char> listCharsDel;
+    char delChar;
     int cursorX;
+    int cursorY;
+    bool startLine;
+    int lenPrevLine;
 };
 
 

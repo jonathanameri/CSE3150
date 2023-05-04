@@ -36,7 +36,7 @@ public:
     bool Redo();                                              // redo the change to the text
     
     //Commands needed to update the model
-    void MergeLineCommand();
+    // void MergeLineCommand();
     void DeleteTextCommand();
     void NewLineCommand();
     void InsertTextCommand(char ch);

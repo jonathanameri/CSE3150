@@ -83,13 +83,13 @@ void ECTextDocumentCtrl :: UpdateView(){
 }
 
 //Commands called by observer
-void ECTextDocumentCtrl :: MergeLineCommand()
-{
-    if(mode != 1) return;
-    ECMergeLineCmd *pCmdMerge = new ECMergeLineCmd( this->doc, doc.GetCursorY() );
-    histCmds.ExecuteCmd( pCmdMerge );
-    numCommands++;
-}
+// void ECTextDocumentCtrl :: MergeLineCommand()
+// {
+//     if(mode != 1) return;
+//     ECMergeLineCmd *pCmdMerge = new ECMergeLineCmd( this->doc, doc.GetCursorY() );
+//     histCmds.ExecuteCmd( pCmdMerge );
+//     numCommands++;
+// }
 
 void ECTextDocumentCtrl :: DeleteTextCommand()
 {
