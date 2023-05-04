@@ -42,6 +42,7 @@ void ArrowKeyObserver :: Update(){
     else if(code == ARROW_UP){
         logxy("up " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
 
+        bool flag = false;
         int localCursorY = _docCtrl->GetCursorY();
         while(localCursorY - 1 >= 0){
             localCursorY--;
@@ -49,29 +50,31 @@ void ArrowKeyObserver :: Update(){
                 break;
             }
         }
+        if(flag){
             if(_docCtrl->GetRowLen(localCursorY) < _docCtrl->GetCursorX())
                 _docCtrl->SetCursorX(_docCtrl->GetRowLen(localCursorY));
             _docCtrl->SetCursorY(localCursorY);
+        }
     }
     else if(code == ARROW_DOWN){
         logxy("down " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
 
-        // if(_docCtrl->GetCursorY() + 1 < _docCtrl->GetNumRows()){
         int displaySize = (_docCtrl->GetNumRows() >= _docCtrl->GetMaxRows()) ? _docCtrl->GetMaxRows() : _docCtrl->GetNumRows();
 
+        bool flag = false;
         int localCursorY = _docCtrl->GetCursorY();
         while(localCursorY + 1 < displaySize){
             localCursorY++;
             if(!_docCtrl->IsRowWrapped(localCursorY)){
+                flag = true;
                 break;
             }
         }
-        // if(_docCtrl->GetCursorY() + 1 < displaySize){
-
+        if (flag) {
             if(_docCtrl->GetRowLen(localCursorY) < _docCtrl->GetCursorX())
                 _docCtrl->SetCursorX(_docCtrl->GetRowLen(localCursorY));
             _docCtrl->SetCursorY(localCursorY);
-        // }
+        }
     }
     //Update cursor position in view
     _docCtrl->UpdateView();
@@ -85,16 +88,6 @@ void BackspaceObserver :: Update(){
         if(code == 127){ // code for backspace
             logxy("backspace " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
             _docCtrl->DeleteTextCommand();
-            // if(_docCtrl->GetCursorX() == 0 )
-            // {
-            //     if(_docCtrl->GetCursorY() == 0)
-            //         return;
-            //     else
-            //         _docCtrl->MergeLineCommand();
-            // }
-            // else{
-            //     _docCtrl->DeleteTextCommand();
-            // }
             _docCtrl->UpdateView();
         }
     }    
@@ -125,7 +118,7 @@ void InsertObserver :: Update(){
     //Hardcoded for now... May change to be initialized in the main file
 
     //If key is a command, ignore, otherwise insert the character
-    vector<int> commands = {ARROW_LEFT, ARROW_RIGHT, ARROW_UP, ARROW_DOWN, 127, 13, 27, 1}; //27 is escape
+    vector<int> commands = {ARROW_LEFT, ARROW_RIGHT, ARROW_UP, ARROW_DOWN, 127, 13, 27, 1, 26, 25}; //27 is escape
     for(int i = 0; i < commands.size(); i++){
         if(code == commands[i]){
             return;
