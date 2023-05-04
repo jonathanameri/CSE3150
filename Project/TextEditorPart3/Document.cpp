@@ -23,12 +23,12 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
             }
             // doc.NewLine( lineNum, GetRowLen(lineNum), false );
             //*************************************************************************************
-            doc.NewLine( lineNum+1, GetRowLen(lineNum), false );
-
+            doc.NewLine( lineNum+1, 0, false );
             lineNum++;
             // doc.InsertRow(doc.GetNumRows()-1, line);
         }
-        doc.RemoveRow(doc.GetNumRows()-1);
+        // doc.RemoveRow(lineNum+1);
+        doc.RemoveCharAt(doc.GetNumRows()-1, 0);
         myfile.close();
 
         // doc.RemoveRow(doc.GetNumRows()-1);
@@ -44,10 +44,20 @@ ECTextDocumentCtrl :: ~ECTextDocumentCtrl(){
     // logxy("--------------------");
     ofstream myfile;
     myfile.open (_filename);
-    vector<string> document = GetDocument();
-    for(int i = 0; i < document.size(); i++){
-        myfile << document[i] << endl;
+    vector<Row> document = doc.GetDocument();
+
+    int i = 0;
+    while(i < document.size() - 1){
+        if(document[i+1].wrapped){
+            myfile << document[i].text;
+        }
+        else{
+            myfile << document[i].text << endl;
+        }
+        i++;
     }
+    myfile << document[i].text;
+
     myfile.close();
 
 }
@@ -64,9 +74,9 @@ void ECTextDocumentCtrl :: UpdateView(){
     //Make Changes
     _view->InitRows();
     _view->ClearColor();
-    vector<string> document = GetDocument();
+    vector<Row> document = doc.GetDocument();
     for(int i = 0; i < document.size(); i++){
-        _view->AddRow(document[i]);
+        _view->AddRow(document[i].text);
     }
     _view->SetCursorX(GetCursorX());
     _view->SetCursorY(GetCursorY());
@@ -107,7 +117,12 @@ void ECTextDocumentCtrl :: InsertTextCommand(char ch)
 //Getters and Setters
 vector<string> ECTextDocumentCtrl :: GetDocument() const
 {
-    return doc.GetDocument();
+    vector<string> document;
+    for(int i = 0; i < doc.GetNumRows(); i++){
+        document.push_back(doc.GetRow(i));
+    }
+    return document;
+    // return doc.GetDocument();
 }
 int ECTextDocumentCtrl :: GetCursorX() const
 {
@@ -349,11 +364,13 @@ void ECTextDocument :: RemoveCharAt(int row, int pos)
     }
 }
 
-vector<string> ECTextDocument :: GetDocument() const
+vector<Row> ECTextDocument :: GetDocument() const
 {
-    vector<string> doc;
-    for(int i = 0; i < GetNumRows(); i++){
-        doc.push_back(GetRow(i));
-    }
-    return doc;
+    // vector<string> doc;
+    // for(int i = 0; i < GetNumRows(); i++){
+    //     doc.push_back(GetRow(i));
+    // }
+    // // doc.erase( doc.begin()+GetNumRows() - 1);
+    // return doc;
+    return listRows;
 }

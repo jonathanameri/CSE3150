@@ -17,6 +17,10 @@ class ECTextDocument;
 
 using namespace std;
 
+struct Row{
+        string text;
+        bool wrapped;
+};
 
 
 // **********************************************************
@@ -65,10 +69,6 @@ private:
 class ECTextDocument
 {
 public:
-    struct Row{
-        string text;
-        bool wrapped;
-    };
 
     ECTextDocument();
     virtual ~ECTextDocument();
@@ -103,13 +103,13 @@ public:
     bool IsRowWrapped(int row) const { return listRows[row].wrapped; }
 
     // void Dump() const;
-    vector<string> GetDocument() const;
+    vector<Row> GetDocument() const;
     
 private:
     // vector<string> listRows;
     int cursorX;
     int cursorY;
-    int MAX_LINE_LEN = 80;
+    int MAX_LINE_LEN = 40;
     vector<Row> listRows;
     // map<int, map<int, pair<int, TEXT_COLOR> > > clrTextInfo;
 

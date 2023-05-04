@@ -159,8 +159,8 @@ void ECInsTextCmd :: Execute()
 void ECInsTextCmd :: UnExecute()
 {
     // undo (i.e. remove the inserted characters)
-    doc.RemoveCharAt( row, posIns );
-    // doc.SetCursorX(cursorX);
+    doc.RemoveCharAt( row, posIns + 1 );
+    doc.SetCursorX(cursorX);
 }
 
 
@@ -173,7 +173,7 @@ ECDelTextCmd :: ~ECDelTextCmd()
 void ECDelTextCmd :: Execute()
 {
     cursorX = doc.GetCursorX();
-    char ch = doc.GetCharAt(rowDel, posDel);
+    char ch = doc.GetCharAt(rowDel, cursorX-1);
     listCharsDel.push_back(ch);
     doc.RemoveCharAt( doc.GetCursorY(), doc.GetCursorX() );
 }
@@ -182,9 +182,9 @@ void ECDelTextCmd :: UnExecute()
     // undo: that is, adding the deleted text back
     for(unsigned int i=0; i<listCharsDel.size(); ++i)
     {
-        doc.InsertCharAt( rowDel, posDel+i, listCharsDel[i] );
+        doc.InsertCharAt( rowDel, posDel+i-1, listCharsDel[i] );
     }
     listCharsDel.clear();
-    // doc.SetCursorX(cursorX);
+    doc.SetCursorX(cursorX);
 }
 
