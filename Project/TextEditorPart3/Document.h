@@ -54,6 +54,9 @@ public:
     int GetNumRows() const;
     int GetMode() const;
     void SetMode(int mode);
+
+    int GetMaxRows() const;
+
 private:
     ECTextDocument &doc;
     ECTextViewImp *_view;
@@ -79,9 +82,9 @@ public:
 //****************************************************************************************
 //TEMPORAILY IMPLEMENTING THESE FOR TESTING PURPOSES
 //****************************************************************************************
-    void InsertRow(int row, const string &str);    // insert a row of text
-    void SetRow(int row, string &str);
-    void RemoveRow(int row);
+    // void InsertRow(int row, const string &str);    // insert a row of text
+    // void SetRow(int row, string &str);
+    // void RemoveRow(int row);
     char GetCharAt(int row, int pos) const;          // get char at current position
 
 
@@ -100,6 +103,7 @@ public:
     void SetCursorY(int y) { cursorY = y; }
 
     int GetMaxLen() const { return MAX_LINE_LEN; }
+    int GetMaxRows() const { return MAX_NUM_ROWS; }
     bool IsRowWrapped(int row) const { return listRows[row].wrapped; }
 
     // void Dump() const;
@@ -109,7 +113,8 @@ private:
     // vector<string> listRows;
     int cursorX;
     int cursorY;
-    int MAX_LINE_LEN = 40;
+    int MAX_LINE_LEN = 20;
+    int MAX_NUM_ROWS = 20;
     vector<Row> listRows;
     // map<int, map<int, pair<int, TEXT_COLOR> > > clrTextInfo;
 

@@ -41,7 +41,9 @@ void ArrowKeyObserver :: Update(){
     else if(code == ARROW_DOWN){
         logxy("down " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
 
-        if(_docCtrl->GetCursorY() + 1 < _docCtrl->GetNumRows()){
+        // if(_docCtrl->GetCursorY() + 1 < _docCtrl->GetNumRows()){
+        int displaySize = (_docCtrl->GetNumRows() >= _docCtrl->GetMaxRows()) ? _docCtrl->GetMaxRows() : _docCtrl->GetNumRows();
+        if(_docCtrl->GetCursorY() + 1 < displaySize){
             if(_docCtrl->GetRowLen(_docCtrl->GetCursorY() + 1) < _docCtrl->GetCursorX())
                 _docCtrl->SetCursorX(_docCtrl->GetRowLen(_docCtrl->GetCursorY() + 1));
             _docCtrl->SetCursorY(_docCtrl->GetCursorY() + 1);

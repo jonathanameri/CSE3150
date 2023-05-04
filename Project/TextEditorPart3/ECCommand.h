@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <string>
+// #include "Document.h"
+
 using namespace std;
 
 class ECTextDocument;
