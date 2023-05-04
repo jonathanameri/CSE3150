@@ -1,6 +1,9 @@
 #include "Observers.h"
 #include <iostream>
 
+
+#include "log.h"
+
 class ECTextDocumentCtrl;
 class ECTextViewImp;
 class ECTextDocument;
@@ -13,16 +16,22 @@ void ArrowKeyObserver :: Update(){
     int code = _subject->GetPressedKey();
 
     if(code == ARROW_LEFT){
+        logxy("left " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
+
         if(_docCtrl->GetCursorX() - 1 >= 0){
             _docCtrl->SetCursorX(_docCtrl->GetCursorX() - 1);
         }
     }
     else if(code == ARROW_RIGHT){
+        logxy("right " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
+
         if(_docCtrl->GetCursorX() + 1 <= _docCtrl->GetRowLen(_docCtrl->GetCursorY())){
             _docCtrl->SetCursorX(_docCtrl->GetCursorX() + 1);
         }
     }
     else if(code == ARROW_UP){
+        logxy("up " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
+
         if(_docCtrl->GetCursorY() - 1 >= 0){
             if(_docCtrl->GetRowLen(_docCtrl->GetCursorY() - 1) < _docCtrl->GetCursorX())
                 _docCtrl->SetCursorX(_docCtrl->GetRowLen(_docCtrl->GetCursorY() - 1));
@@ -30,6 +39,8 @@ void ArrowKeyObserver :: Update(){
         }
     }
     else if(code == ARROW_DOWN){
+        logxy("down " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
+
         if(_docCtrl->GetCursorY() + 1 < _docCtrl->GetNumRows()){
             if(_docCtrl->GetRowLen(_docCtrl->GetCursorY() + 1) < _docCtrl->GetCursorX())
                 _docCtrl->SetCursorX(_docCtrl->GetRowLen(_docCtrl->GetCursorY() + 1));
@@ -46,6 +57,7 @@ void BackspaceObserver :: Update(){
     if(_docCtrl->GetMode() == 1){
         int code = _subject->GetPressedKey();
         if(code == 127){ // code for backspace
+            logxy("backspace " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
             _docCtrl->DeleteTextCommand();
             // if(_docCtrl->GetCursorX() == 0 )
             // {
@@ -67,6 +79,7 @@ void BackspaceObserver :: Update(){
 void EnterObserver :: Update(){
     int code = _subject->GetPressedKey();
     if (code == 13 && _docCtrl->GetMode() == 1){
+        logxy("enter " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
         _docCtrl->NewLineCommand();
         _docCtrl->UpdateView();
     }
@@ -77,6 +90,7 @@ void EnterObserver :: Update(){
 void InsertObserver :: Update(){
     int code = _subject->GetPressedKey();
     if(_docCtrl->GetMode() == 0 && (char)code == 'i'){
+        logxy("i " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
         _docCtrl->SetMode(1);
         return;
     }
@@ -85,7 +99,7 @@ void InsertObserver :: Update(){
     //Hardcoded for now... May change to be initialized in the main file
 
     //If key is a command, ignore, otherwise insert the character
-    vector<int> commands = {ARROW_LEFT, ARROW_RIGHT, ARROW_UP, ARROW_DOWN, 127, 13, 27}; //27 is escape
+    vector<int> commands = {ARROW_LEFT, ARROW_RIGHT, ARROW_UP, ARROW_DOWN, 127, 13, 27, 1}; //27 is escape
     for(int i = 0; i < commands.size(); i++){
         if(code == commands[i]){
             return;
@@ -94,6 +108,7 @@ void InsertObserver :: Update(){
 
     //If in insert mode, insert the character
     //If in command mode but key is 'i', switch to insert mode
+    logxy("insert " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
     _docCtrl->InsertTextCommand( (char)code );
     _docCtrl->UpdateView();
 }
@@ -104,6 +119,7 @@ void EscapeObserver :: Update(){
     if(_docCtrl->GetMode() != 1) return;
     int code = _subject->GetPressedKey();
     if(code == 27 || code == 1){
+        logxy("escape " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
         _docCtrl->SetMode(0);
     }
 }

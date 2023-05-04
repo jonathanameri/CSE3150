@@ -91,23 +91,24 @@ void ECNewLineCmd :: Execute()
     if(cursorX == -1) cursorX = doc.GetCursorX();
     if(cursorY == -1) cursorY = doc.GetCursorY();
     oldLine = doc.GetRow(row);
-    if (cursorX == doc.GetRowLen(row))
-    {
-        //Insert new line
-        doc.InsertRow( row + 1, "" );
-        // doc.SetCursorX(0);
-        // doc.SetCursorY(row + 1);
-    }
-    else{
-        //Split line
-        string str = doc.GetRow(row);
-        string str1 = str.substr(0, cursorX);
-        string str2 = str.substr(cursorX, str.length() - cursorX);
-        doc.SetRow(row, str1);
-        doc.InsertRow(row + 1, str2);
-        // doc.SetCursorX(0);
-        // doc.SetCursorY(row + 1);
-    }
+    doc.NewLine(cursorY, cursorX, false);
+    // if (cursorX == doc.GetRowLen(row))
+    // {
+    //     //Insert new line
+    //     doc.InsertRow( row + 1, "" );
+    //     // doc.SetCursorX(0);
+    //     // doc.SetCursorY(row + 1);
+    // }
+    // else{
+    //     //Split line
+    //     string str = doc.GetRow(row);
+    //     string str1 = str.substr(0, cursorX);
+    //     string str2 = str.substr(cursorX, str.length() - cursorX);
+    //     doc.SetRow(row, str1);
+    //     doc.InsertRow(row + 1, str2);
+    //     // doc.SetCursorX(0);
+    //     // doc.SetCursorY(row + 1);
+    // }
 }
 
 void ECNewLineCmd :: UnExecute()
@@ -174,7 +175,7 @@ void ECDelTextCmd :: Execute()
     cursorX = doc.GetCursorX();
     char ch = doc.GetCharAt(rowDel, posDel);
     listCharsDel.push_back(ch);
-    doc.RemoveCharAt( rowDel, posDel );
+    doc.RemoveCharAt( doc.GetCursorY(), doc.GetCursorX() );
 }
 void ECDelTextCmd :: UnExecute()
 {

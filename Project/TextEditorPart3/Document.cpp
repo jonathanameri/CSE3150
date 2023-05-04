@@ -1,4 +1,5 @@
 #include "Document.h"
+// #include "log.h"
 
 // **********************************************************
 // Controller for text document
@@ -20,7 +21,10 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
             for(int i = 0; i < line.length(); i++){
                 doc.InsertCharAt(lineNum, i, line[i]);
             }
+            // doc.NewLine( lineNum, GetRowLen(lineNum), false );
+            //*************************************************************************************
             doc.NewLine( lineNum+1, GetRowLen(lineNum), false );
+
             lineNum++;
             // doc.InsertRow(doc.GetNumRows()-1, line);
         }
@@ -37,6 +41,7 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
 }
 ECTextDocumentCtrl :: ~ECTextDocumentCtrl(){
     // Save the document to the file
+    // logxy("--------------------");
     ofstream myfile;
     myfile.open (_filename);
     vector<string> document = GetDocument();
@@ -214,31 +219,54 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
     cursorY = row;
 
     //No matter what there will be a new line created
+
+    // if(cursorX == 0) listRows.insert( listRows.begin()+cursorY, Row{"", isWrapped} );
+    // else if (cursorX > 0) listRows.insert( listRows.begin()+cursorY+1, Row{"", isWrapped} );
+    // if(cursorX == GetRowLen(cursorY)){
+    //     listRows.insert( listRows.begin() + cursorY + 1, Row{"", isWrapped} );
+    //     cursorY++;
+    //     return;
+    // }
+
     listRows.insert( listRows.begin()+cursorY, Row{"", isWrapped} );
 
+    cursorY++;
+    int lineToSplit = cursorY;
+    // if(cursorY > 0) lineToSplit = cursorY ;
 
-    if(pos < GetRowLen(cursorY)){
+    if(cursorX < GetRowLen(lineToSplit)){
         //Split the string
-        string str1 = listRows[cursorY].text.substr(0,cursorX);
-        string str2 = listRows[cursorY].text.substr(cursorX);
+        string str1 = listRows[lineToSplit].text.substr(0,cursorX);
+        string str2 = listRows[lineToSplit].text.substr(cursorX);
         
         //Erase old line
-        for(int i = GetRowLen(cursorY) - 1; i >= 0 ; i--){
-            RemoveCharAt(cursorY, i-1);
+        //************* STRANGE IMPLEMENTATION BUT ITS HOW I DID IT!!!! *************
+        //The syntax here is weird because RemoveCharAt deletes the char BEFORE the cursor
+        for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
+            RemoveCharAt(lineToSplit, i);
         }
 
         //Insert new lines
         for(int i = 0; i < str1.size(); i++){
-            InsertCharAt(cursorY, i, str1[i]);
+            InsertCharAt(lineToSplit-1, i, str1[i]);
         }
         for(int i = 0; i < str2.size(); i++){
-            InsertCharAt(cursorY+1, i, str2[i]);
+            InsertCharAt(lineToSplit, i, str2[i]);
         }
         // listRows.insert( listRows.begin()+row+1, listRows[row+1].substr(pos) );
         // listRows[row] = listRows[row].substr(0, pos);
     }
+    else{
+        string str = listRows[lineToSplit].text;
+        for(int i = 0; i < str.size(); i ++){
+            InsertCharAt(lineToSplit-1, i, str[i]);
+        }
+        for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
+            RemoveCharAt(lineToSplit, i);
+        }
+    }
     SetCursorX(0);
-    SetCursorY(cursorY+1);
+    // SetCursorY(cursorY+1);
     // listRows.insert( listRows.begin()+row, listRows[row].substr(pos) );
 }
 
@@ -252,17 +280,24 @@ void ECTextDocument :: InsertCharAt(int row, int pos, char ch)
 
     //Check if the line is now too long
     if(GetRowLen(cursorY) > MAX_LINE_LEN){
+        //If not the last line ( here just to be safe for the next if statement)
         if(GetNumRows()-1 >= cursorY+1){
+            //If the next line is not wrapped
             if(!IsRowWrapped(cursorY+1)){
                 NewLine(cursorY, MAX_LINE_LEN, true);
+                InsertCharAt(cursorY, 0, listRows[cursorY].text[MAX_LINE_LEN]);
+                listRows[cursorY-1].text.erase( listRows[cursorY-1].text.begin()+MAX_LINE_LEN );
             }
-            InsertCharAt(cursorY+1, 0, listRows[cursorY].text[MAX_LINE_LEN]);
-            listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN );
+            else{
+                InsertCharAt(cursorY+1, 0, listRows[cursorY].text[MAX_LINE_LEN]);
+                listRows[cursorY-1].text.erase( listRows[cursorY-1].text.begin()+MAX_LINE_LEN );
+            }
+            
         }
         else{
             NewLine(cursorY, MAX_LINE_LEN, true);
-            InsertCharAt(cursorY+1, 0, listRows[cursorY].text[MAX_LINE_LEN]);
-            listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN );
+            InsertCharAt(cursorY, 0, listRows[cursorY].text[MAX_LINE_LEN]);
+            listRows[cursorY-1].text.erase( listRows[cursorY-1].text.begin()+MAX_LINE_LEN );
         }
     }
 
@@ -275,7 +310,8 @@ void ECTextDocument :: RemoveCharAt(int row, int pos)
     cursorY = row;
 
     //If at beginning of a line
-    if(cursorX == 0 && cursorY > 0){
+    if(cursorX == 0 && cursorY >= 0){
+        if(cursorY == 0) return;
         cursorY--;
         cursorX = GetRowLen(cursorY);
 
