@@ -42,22 +42,36 @@ void ArrowKeyObserver :: Update(){
     else if(code == ARROW_UP){
         logxy("up " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
 
-        if(_docCtrl->GetCursorY() - 1 >= 0){
-            if(_docCtrl->GetRowLen(_docCtrl->GetCursorY() - 1) < _docCtrl->GetCursorX())
-                _docCtrl->SetCursorX(_docCtrl->GetRowLen(_docCtrl->GetCursorY() - 1));
-            _docCtrl->SetCursorY(_docCtrl->GetCursorY() - 1);
+        int localCursorY = _docCtrl->GetCursorY();
+        while(localCursorY - 1 >= 0){
+            localCursorY--;
+            if(!_docCtrl->IsRowWrapped(localCursorY)){
+                break;
+            }
         }
+            if(_docCtrl->GetRowLen(localCursorY) < _docCtrl->GetCursorX())
+                _docCtrl->SetCursorX(_docCtrl->GetRowLen(localCursorY));
+            _docCtrl->SetCursorY(localCursorY);
     }
     else if(code == ARROW_DOWN){
         logxy("down " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
 
         // if(_docCtrl->GetCursorY() + 1 < _docCtrl->GetNumRows()){
         int displaySize = (_docCtrl->GetNumRows() >= _docCtrl->GetMaxRows()) ? _docCtrl->GetMaxRows() : _docCtrl->GetNumRows();
-        if(_docCtrl->GetCursorY() + 1 < displaySize){
-            if(_docCtrl->GetRowLen(_docCtrl->GetCursorY() + 1) < _docCtrl->GetCursorX())
-                _docCtrl->SetCursorX(_docCtrl->GetRowLen(_docCtrl->GetCursorY() + 1));
-            _docCtrl->SetCursorY(_docCtrl->GetCursorY() + 1);
+
+        int localCursorY = _docCtrl->GetCursorY();
+        while(localCursorY + 1 < displaySize){
+            localCursorY++;
+            if(!_docCtrl->IsRowWrapped(localCursorY)){
+                break;
+            }
         }
+        // if(_docCtrl->GetCursorY() + 1 < displaySize){
+
+            if(_docCtrl->GetRowLen(localCursorY) < _docCtrl->GetCursorX())
+                _docCtrl->SetCursorX(_docCtrl->GetRowLen(localCursorY));
+            _docCtrl->SetCursorY(localCursorY);
+        // }
     }
     //Update cursor position in view
     _docCtrl->UpdateView();
