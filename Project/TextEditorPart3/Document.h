@@ -56,6 +56,7 @@ public:
     void SetMode(int mode);
 
     int GetMaxRows() const;
+    bool IsRowWrapped(int row) const;
 
 private:
     ECTextDocument &doc;

@@ -21,12 +21,22 @@ void ArrowKeyObserver :: Update(){
         if(_docCtrl->GetCursorX() - 1 >= 0){
             _docCtrl->SetCursorX(_docCtrl->GetCursorX() - 1);
         }
+        else if(_docCtrl->GetCursorX() == 0 && _docCtrl->GetCursorY() - 1 >= 0){
+            if(_docCtrl->IsRowWrapped(_docCtrl->GetCursorY())){
+                _docCtrl->SetCursorY(_docCtrl->GetCursorY() - 1);
+                _docCtrl->SetCursorX(_docCtrl->GetRowLen(_docCtrl->GetCursorY()));
+            }
+        }
     }
     else if(code == ARROW_RIGHT){
         logxy("right " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
 
         if(_docCtrl->GetCursorX() + 1 <= _docCtrl->GetRowLen(_docCtrl->GetCursorY())){
             _docCtrl->SetCursorX(_docCtrl->GetCursorX() + 1);
+        }
+        else if(_docCtrl->GetCursorY() + 1 <= _docCtrl->GetNumRows() -1 && _docCtrl->IsRowWrapped(_docCtrl->GetCursorY()+1)){
+            _docCtrl->SetCursorY(_docCtrl->GetCursorY() + 1);
+            _docCtrl->SetCursorX(0);
         }
     }
     else if(code == ARROW_UP){

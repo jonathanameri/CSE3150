@@ -188,6 +188,10 @@ int ECTextDocumentCtrl :: GetMaxRows() const
 {
     return doc.GetMaxRows();
 }
+bool ECTextDocumentCtrl :: IsRowWrapped(int row) const
+{
+    return doc.IsRowWrapped(row);
+}
 int ECTextDocumentCtrl :: GetMode() const
 {
     return mode;
