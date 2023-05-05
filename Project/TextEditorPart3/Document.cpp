@@ -1,5 +1,5 @@
 #include "Document.h"
-// #include "log.h"
+#include "log.h"
 
 // **********************************************************
 // Controller for text document
@@ -103,16 +103,35 @@ bool ECTextDocumentCtrl :: Redo()
     return histCmds.Redo();
 }
 void ECTextDocumentCtrl :: UpdateView(){
+    // logxy("UpdateView   " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     //Make Changes
     _view->InitRows();
     _view->ClearColor();
+
+
+
+    doc.CheckWrappedRows(GetCursorX(), GetCursorY());
+
+
+
+
     vector<Row> document = doc.GetDocument();
     // for(int i = 0; i < document.size(); i++){
     //     _view->AddRow(document[i].text);
     // }
     int displaySize = (document.size() >= doc.GetMaxRows()) ? doc.GetMaxRows() : document.size();
     for(int i = 0; i < displaySize; i++){
-        _view->AddRow(document[i].text);
+        if(document[i].wrapped){
+            string extra = "";
+            for(int j = 0; j < doc.GetMaxLen() - doc.GetRowLen(i); j++){
+                extra += " ";
+            }
+            _view->AddRow(document[i].text + extra + " *");
+        }
+        else{
+            _view->AddRow(document[i].text);
+        }
+        // _view->AddRow(document[i].text);
     }
     _view->SetCursorX(GetCursorX());
     _view->SetCursorY(GetCursorY());
@@ -275,6 +294,7 @@ char ECTextDocument :: GetCharAt(int row, int pos) const
 
 //Representing Enter key being hit
 void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
+    logxy("NewLine            " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     cursorX = pos;
     cursorY = row;
 
@@ -333,43 +353,49 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
 
 void ECTextDocument :: InsertCharAt(int row, int pos, char ch)
 {
+    logxy("InsertCharAt       " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     //Simply insert the character
     cursorX = pos;
     cursorY = row;
 
     listRows[cursorY].text.insert( listRows[cursorY].text.begin()+cursorX, ch ); 
 
+
+    // CheckWrappedRows(GetCursorX(), GetCursorY());
+
     //cursor is always increased no matter what happened
     cursorX++;
 
+
     //Check if the line is now too long
-    if(GetRowLen(cursorY) > MAX_LINE_LEN){
-        //If not the last line ( here just to be safe for the next if statement)
-        if(GetNumRows()-1 >= cursorY+1){
-            //If the next line is not wrapped
-            if(!IsRowWrapped(cursorY+1)){
-                NewLine(cursorY, MAX_LINE_LEN, true);
-                cursorX++;
-            }
-            //IF THE NEXT LINE IS ALREADY WRAPPED
-            else{
-                NewLine(cursorY, MAX_LINE_LEN, true);
-                cursorY++;
-                RemoveCharAt(cursorY+1, 0);
-                SetCursorX(GetRowLen(cursorY));
-            }
-        }
-        else{
-            NewLine(cursorY, MAX_LINE_LEN, true);
-            cursorY++;
-            SetCursorX(GetRowLen(cursorY));
-        }
-    }
+    // if(GetRowLen(cursorY) > MAX_LINE_LEN){
+    //     //If not the last line ( here just to be safe for the next if statement)
+    //     if(GetNumRows()-1 >= cursorY+1){
+    //         //If the next line is not wrapped
+    //         if(!IsRowWrapped(cursorY+1)){
+    //             NewLine(cursorY, MAX_LINE_LEN, true);
+    //             cursorX++;
+    //         }
+    //         //IF THE NEXT LINE IS ALREADY WRAPPED
+    //         else{
+    //             NewLine(cursorY, MAX_LINE_LEN, true);
+    //             cursorY++;
+    //             RemoveCharAt(cursorY+1, 0);
+    //             SetCursorX(GetRowLen(cursorY));
+    //         }
+    //     }
+    //     else{
+    //         NewLine(cursorY, MAX_LINE_LEN, true);
+    //         cursorY++;
+    //         SetCursorX(GetRowLen(cursorY));
+    //     }
+    // }
 
     
 }
 void ECTextDocument :: RemoveCharAt(int row, int pos)
 {
+    logxy("RemoveCharAt       " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     cursorX = pos;
     cursorY = row;
 
@@ -385,71 +411,111 @@ void ECTextDocument :: RemoveCharAt(int row, int pos)
 
 
 
-        //Check if the line is now too long
-        if(GetRowLen(cursorY) > MAX_LINE_LEN){
-            //If not the last line ( here just to be safe for the next if statement)
-            if(GetNumRows()-1 >= cursorY+1){
-                //If the next line is not wrapped
-                if(!IsRowWrapped(cursorY+1)){
-                    NewLine(cursorY, MAX_LINE_LEN, true);
-                    cursorX++;
-                }
-                //IF THE NEXT LINE IS ALREADY WRAPPED
-                else{
-                    NewLine(cursorY, MAX_LINE_LEN, true);
-                    cursorY++;
-                    RemoveCharAt(cursorY+1, 0);
-                    SetCursorX(GetRowLen(cursorY));
-                }
-            }
-            else{
-                NewLine(cursorY, MAX_LINE_LEN, true);
-                cursorY++;
-                SetCursorX(GetRowLen(cursorY));
-            }
-        }
+        // //Check if the line is now too long
+        // if(GetRowLen(cursorY) > MAX_LINE_LEN){
+        //     //If not the last line ( here just to be safe for the next if statement)
+        //     if(GetNumRows()-1 >= cursorY+1){
+        //         //If the next line is not wrapped
+        //         if(!IsRowWrapped(cursorY+1)){
+        //             NewLine(cursorY, MAX_LINE_LEN, true);
+        //             cursorX++;
+        //         }
+        //         //IF THE NEXT LINE IS ALREADY WRAPPED
+        //         else{
+        //             NewLine(cursorY, MAX_LINE_LEN, true);
+        //             cursorY++;
+        //             RemoveCharAt(cursorY+1, 0);
+        //             SetCursorX(GetRowLen(cursorY));
+        //         }
+        //     }
+        //     else{
+        //         NewLine(cursorY, MAX_LINE_LEN, true);
+        //         cursorY++;
+        //         SetCursorX(GetRowLen(cursorY));
+        //     }
+        // }
+
+        
 
 
 
-
-
-        //Check if the previous line is now too long
-        if(GetRowLen(cursorY) > MAX_LINE_LEN){
-            //If not the last line ( here just to be safe for the next if statement)
-            if(GetNumRows()-1 >= cursorY+1){
-                //If the next line is not wrapped
-                if(!IsRowWrapped(cursorY+1)){
-                    NewLine(cursorY, MAX_LINE_LEN, true);
-                    cursorX++;
-                }
-                //IF THE NEXT LINE IS ALREADY WRAPPED
-                else{
-                    NewLine(cursorY, MAX_LINE_LEN, true);
-                    cursorY++;
-                    RemoveCharAt(cursorY+1, 0);
-                    SetCursorX(GetRowLen(cursorY));
-                }
-                // for(int i = MAX_LINE_LEN; i < GetRowLen(cursorY); i++){
-                //     InsertCharAt(cursorY+1, i-MAX_LINE_LEN, listRows[cursorY].text[i]);
-                // }
-                // listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN, listRows[cursorY].text.end() );
-            }
-            else{
-                NewLine(cursorY, MAX_LINE_LEN, true);
-                cursorY++;
-                SetCursorX(GetRowLen(cursorY));
-                // NewLine(cursorY, MAX_LINE_LEN, true);
-                // for(int i = MAX_LINE_LEN; i < GetRowLen(cursorY); i++){
-                //     InsertCharAt(cursorY+1, i-MAX_LINE_LEN, listRows[cursorY].text[i]);
-                // }
-                // listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN, listRows[cursorY].text.end() );
-            }
-        }
+        // //Check if the previous line is now too long
+        // if(GetRowLen(cursorY) > MAX_LINE_LEN){
+        //     //If not the last line ( here just to be safe for the next if statement)
+        //     if(GetNumRows()-1 >= cursorY+1){
+        //         //If the next line is not wrapped
+        //         if(!IsRowWrapped(cursorY+1)){
+        //             NewLine(cursorY, MAX_LINE_LEN, true);
+        //             cursorX++;
+        //         }
+        //         //IF THE NEXT LINE IS ALREADY WRAPPED
+        //         else{
+        //             NewLine(cursorY, MAX_LINE_LEN, true);
+        //             cursorY++;
+        //             RemoveCharAt(cursorY+1, 0);
+        //             SetCursorX(GetRowLen(cursorY));
+        //         }
+        //         // for(int i = MAX_LINE_LEN; i < GetRowLen(cursorY); i++){
+        //         //     InsertCharAt(cursorY+1, i-MAX_LINE_LEN, listRows[cursorY].text[i]);
+        //         // }
+        //         // listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN, listRows[cursorY].text.end() );
+        //     }
+        //     else{
+        //         NewLine(cursorY, MAX_LINE_LEN, true);
+        //         cursorY++;
+        //         SetCursorX(GetRowLen(cursorY));
+        //         // NewLine(cursorY, MAX_LINE_LEN, true);
+        //         // for(int i = MAX_LINE_LEN; i < GetRowLen(cursorY); i++){
+        //         //     InsertCharAt(cursorY+1, i-MAX_LINE_LEN, listRows[cursorY].text[i]);
+        //         // }
+        //         // listRows[cursorY].text.erase( listRows[cursorY].text.begin()+MAX_LINE_LEN, listRows[cursorY].text.end() );
+        //     }
+        // }
     }
     else{
         listRows[cursorY].text.erase( listRows[cursorY].text.begin()+cursorX -1);
         cursorX--;
     }
+    // CheckWrappedRows(GetCursorX(), GetCursorY());
+}
+
+void ECTextDocument :: CheckWrappedRows(int oldCursorX, int oldCursorY){
+    logxy("CheckWrappedRows   " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
+    for(int curRow = 0; curRow < GetNumRows(); curRow++){
+        if(IsRowWrapped(curRow)){
+            //If a line is wrapped, we have to worry about if the line before is too short due to a character deletion
+            //This shouldnt matter if the line before is wrapped or not
+            if (GetRowLen(curRow-1) < MAX_LINE_LEN){
+                RemoveCharAt(curRow, 0);
+            }
+        }
+            //Else, logic from earlier
+        cursorY = curRow;
+        if(GetRowLen(cursorY) > MAX_LINE_LEN){
+            //If not the last line ( here just to be safe for the next if statement)
+            if(GetNumRows()-1 >= cursorY+1){
+                //If the next line is not wrapped
+                if(!IsRowWrapped(cursorY+1)){
+                    NewLine(cursorY, MAX_LINE_LEN, true);
+                    cursorX++;
+                }
+                //IF THE NEXT LINE IS ALREADY WRAPPED
+                else{
+                    NewLine(cursorY, MAX_LINE_LEN, true);
+                    cursorY++;
+                    RemoveCharAt(cursorY+1, 0);
+                    SetCursorX(GetRowLen(cursorY));
+                }
+            }
+            else{
+                NewLine(cursorY, MAX_LINE_LEN, true);
+                cursorY++;
+                SetCursorX(GetRowLen(cursorY));
+            }
+        }
+    }
+    SetCursorX(oldCursorX);
+    SetCursorY(oldCursorY);
 }
 
 vector<Row> ECTextDocument :: GetDocument() const

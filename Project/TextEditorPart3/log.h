@@ -1,3 +1,6 @@
+#ifndef log_H
+#define log_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -32,3 +35,6 @@ void logxy(string s){
 
     myfile2.close();
 }
+
+
+#endif

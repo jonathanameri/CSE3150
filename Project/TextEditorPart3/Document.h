@@ -98,6 +98,8 @@ public:
     void InsertCharAt(int row, int pos, char ch);    // insert a single char at position
     void RemoveCharAt(int row, int pos);             // erase a single char at position
 
+    void CheckWrappedRows(int oldCursorX, int oldCursorY);
+
     int GetCursorX() const { return cursorX; }
     int GetCursorY() const { return cursorY; }
     void SetCursorX(int x) { cursorX = x; }

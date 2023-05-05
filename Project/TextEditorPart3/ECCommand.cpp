@@ -88,8 +88,10 @@ void ECCommandHistory:: AddCheckpoint(int x){
 void ECNewLineCmd :: Execute()
 {
     //Check if mid line or at end of line
-    if(cursorX == -1) cursorX = doc.GetCursorX();
-    if(cursorY == -1) cursorY = doc.GetCursorY();
+    // if(cursorX == -1) 
+    cursorX = doc.GetCursorX();
+    // if(cursorY == -1) 
+    cursorY = doc.GetCursorY();
     oldLine = doc.GetRow(cursorY);
 
     if(cursorX == doc.GetRowLen(cursorY)) endOfLine = true;
