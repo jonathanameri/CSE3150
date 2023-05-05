@@ -57,27 +57,6 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
         myfile2.close();
     }
 
-    // if (myfile.is_open())
-    // {
-    //     int lineNum = 0;
-    //     while ( getline (myfile,line) )
-    //     {
-    //         for(int i = 0; i < line.length(); i++){
-    //             doc.InsertCharAt(lineNum, i, line[i]);
-    //         }
-    //         // doc.NewLine( lineNum, GetRowLen(lineNum), false );
-    //         //*************************************************************************************
-    //         doc.NewLine( lineNum+1, 0, false );
-    //         lineNum++;
-    //         // doc.InsertRow(doc.GetNumRows()-1, line);
-    //     }
-    //     // doc.RemoveRow(lineNum+1);
-    //     doc.RemoveCharAt(doc.GetNumRows()-1, 0);
-    //     myfile.close();
-
-    //     // doc.RemoveRow(doc.GetNumRows()-1);
-    // }
-
     SetCursorX(0);
     SetCursorY(0);
     UpdateView(true);
@@ -127,9 +106,6 @@ void ECTextDocumentCtrl :: UpdateView(bool checkWrappedRows){
     vector<Row> document = doc.GetDocument();
 
 
-    // for(int i = 0; i < document.size(); i++){
-    //     _view->AddRow(document[i].text);
-    // }
     int displaySize = (document.size() >= doc.GetMaxRows()) ? doc.GetMaxRows() : document.size();
     for(int i = 0; i < displaySize; i++){
         //Just for testing*****************************************
@@ -153,8 +129,6 @@ void ECTextDocumentCtrl :: UpdateView(bool checkWrappedRows){
         _view->SetColor(keywords[i][0], keywords[i][1], keywords[i][2], TEXT_COLOR_BLUE);
         // _view->AddRow("KEYWORD DETECTED");
     }
-    // _view->SetColor(0, 2, 2, TEXT_COLOR_BLUE);
-
     _view->SetCursorX(GetCursorX());
     _view->SetCursorY(GetCursorY());
 }
@@ -263,9 +237,6 @@ int ECTextDocument :: GetRowLen(int row) const { return listRows[row].text.size(
 //TODO maybe change this so that GetRow returns the wrapped text from next line(s)
 string ECTextDocument :: GetRow(int row) const
 {
-    // if(GetNumRows()-1 >= row+1 && IsRowWrapped(row+1)){
-    //     return listRows[row].text + GetRow(row+1);
-    // }
     return listRows[row].text;
 }
 
@@ -273,28 +244,6 @@ string ECTextDocument :: GetRow(int row) const
 // ****************************************************************************************
 // TEMPORAILY IMPLEMENTING THESE FOR TESTING PURPOSES
 // ****************************************************************************************
-
-// void ECTextDocument :: InsertRow(int row, const string &str)
-// {
-//     NewLine(row, 0, false);
-//     for(int i = 0; i < str.size(); i++){
-//         InsertCharAt(row, i, str[i]);
-//     }
-//     // listRows.insert( listRows.begin()+row, str );
-// }
-// void ECTextDocument :: RemoveRow(int row){
-//     for(int i = GetRowLen(row) - 1; i >= 0 ; i--){
-//         RemoveCharAt(row, i);
-//     }
-// }
-// void ECTextDocument :: SetRow(int row, string &str){
-//     for(int i = GetRowLen(row) - 1; i >= 0 ; i--){
-//         RemoveCharAt(row, i);
-//     }
-//     for(int i = 0; i < str.size(); i++){
-//         InsertCharAt(row, i, str[i]);
-//     }
-// }
 
 char ECTextDocument :: GetCharAt(int row, int pos) const
 {
@@ -579,11 +528,6 @@ void ECTextDocument :: CheckKeywords(){
             for( int k = 0; k < wordPositions.size(); k ++){
                 keywordPositions.push_back(vector<int>{i, wordPositions[k], wordPositions[k] + (int)keywords[j].size()-1});
             }
-            // int pos = listRows[i].text.find(keywords[j]);
-            // if(pos != string::npos){
-            //     keywordPositions.push_back(vector<int>{i, pos, pos+ (int)keywords[j].size()-1});
-            //     // vector<int> {1, 2, 3}
-            // }
         }
     }
 }

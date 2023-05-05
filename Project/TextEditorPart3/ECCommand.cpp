@@ -127,33 +127,6 @@ void ECNewLineCmd :: UnExecute()
 
 
 // **********************************************************
-// Command for merging lines
-// void ECMergeLineCmd :: Execute()
-// {
-//     cursorX = doc.GetCursorX();
-//     cursorY = doc.GetCursorY();
-//     str1 = doc.GetRow(row-1);
-//     str2 = doc.GetRow(row);
-//     string str = str1 + str2;
-//     doc.SetRow(row - 1, str);
-//     doc.RemoveRow(row);
-//     // doc.SetCursorX(str1.length());
-//     // doc.SetCursorY(row - 1);
-// }
-
-// void ECMergeLineCmd :: UnExecute()
-// {
-//     // string str = doc.GetRow(row-1);
-//     // string str1 = str.substr(0, lenLine);
-//     // string str2 = str.substr(lenLine, str.length() - lenLine);
-//     doc.SetRow(row-1, str1);
-//     doc.InsertRow(row, str2);
-//     // doc.SetCursorX(cursorX);
-//     // doc.SetCursorY(cursorY);
-// }
-
-
-// **********************************************************
 // Command for insertion
 void ECInsTextCmd :: Execute()
 {
@@ -181,10 +154,6 @@ void ECInsTextCmd :: UnExecute()
 
 // **********************************************************
 // Command for deletion
-// ECDelTextCmd :: ~ECDelTextCmd()
-// {
-//     listCharsDel.clear();
-// }
 void ECDelTextCmd :: Execute()
 {
     if(cursorX == -1) 
@@ -201,7 +170,7 @@ void ECDelTextCmd :: Execute()
 
     char ch = doc.GetCharAt(cursorY, cursorX-1);
     delChar = ch;
-    doc.RemoveCharAt( doc.GetCursorY(), doc.GetCursorX() );
+    doc.RemoveCharAt( cursorY, cursorX );
 }
 void ECDelTextCmd :: UnExecute()
 {

@@ -120,7 +120,7 @@ private:
     // vector<string> listRows;
     int cursorX;
     int cursorY;
-    int MAX_LINE_LEN = 20;
+    int MAX_LINE_LEN = 70;
     int MAX_NUM_ROWS = 20;
     vector<Row> listRows;
     vector<string> keywords;
