@@ -68,7 +68,7 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
 
     SetCursorX(0);
     SetCursorY(0);
-    UpdateView();
+    UpdateView(true);
     // else return -1; 
 }
 ECTextDocumentCtrl :: ~ECTextDocumentCtrl(){
@@ -102,7 +102,7 @@ bool ECTextDocumentCtrl :: Redo()
 {
     return histCmds.Redo();
 }
-void ECTextDocumentCtrl :: UpdateView(){
+void ECTextDocumentCtrl :: UpdateView(bool checkWrappedRows){
     // logxy("UpdateView   " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     //Make Changes
     _view->InitRows();
@@ -110,7 +110,7 @@ void ECTextDocumentCtrl :: UpdateView(){
 
 
 
-    doc.CheckWrappedRows(GetCursorX(), GetCursorY());
+    if ( checkWrappedRows) doc.CheckWrappedRows(GetCursorX(), GetCursorY());
 
 
 
@@ -299,18 +299,14 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
     cursorY = row;
 
     //No matter what there will be a new line created
-    if(IsRowWrapped(cursorY)){
-        listRows.insert( listRows.begin()+cursorY, Row{"", true} );
-    }
-    else{
-        listRows.insert( listRows.begin()+cursorY, Row{"", false} );
-    }
+    listRows.insert( listRows.begin()+cursorY+1, Row{"", isWrapped} );
+
     //TODO change the inserted line to check if it should be wrapped without assuming false (This is the case if its a multi wrapped line)
     // listRows.insert( listRows.begin()+cursorY, Row{"", false} );
     // listRows.insert( listRows.begin()+cursorY, Row{"", isWrapped} );
-    listRows[cursorY+1].wrapped = isWrapped;
+    // listRows[cursorY+1].wrapped = isWrapped;
 
-    cursorY++;
+    // cursorY++;
     int lineToSplit = cursorY;
     // if(cursorY > 0) lineToSplit = cursorY ;
 
@@ -319,33 +315,44 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
         string str1 = listRows[lineToSplit].text.substr(0,cursorX);
         string str2 = listRows[lineToSplit].text.substr(cursorX);
         
+        for(int i = GetRowLen(lineToSplit) ; i > str1.size() ; i--){
+            RemoveCharAt(lineToSplit, i);
+        }
+        for(int i = 0; i < str2.size(); i++){
+            InsertCharAt(lineToSplit+1, i, str2[i]);
+        }
+    }
+    else{
+        cursorY++;
+    }
         //Erase old line
         //************* STRANGE IMPLEMENTATION BUT ITS HOW I DID IT!!!! *************
         //The syntax here is weird because RemoveCharAt deletes the char BEFORE the cursor
-        for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
-            RemoveCharAt(lineToSplit, i);
-        }
+        // for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
+        //     RemoveCharAt(lineToSplit, i);
+        // }
 
-        //Insert new lines
-        for(int i = 0; i < str2.size(); i++){
-            InsertCharAt(lineToSplit, i, str2[i]);
-        }
-        for(int i = 0; i < str1.size(); i++){
-            InsertCharAt(lineToSplit-1, i, str1[i]);
-        }
+        // //Insert new lines
+        // for(int i = 0; i < str2.size(); i++){
+        //     InsertCharAt(lineToSplit+1, i, str2[i]);
+        // }
+        // for(int i = 0; i < str1.size(); i++){
+        //     InsertCharAt(lineToSplit, i, str1[i]);
+        // }
         
         // listRows.insert( listRows.begin()+row+1, listRows[row+1].substr(pos) );
         // listRows[row] = listRows[row].substr(0, pos);
-    }
-    else{
-        string str = listRows[lineToSplit].text;
-        for(int i = 0; i < str.size(); i ++){
-            InsertCharAt(lineToSplit-1, i, str[i]);
-        }
-        for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
-            RemoveCharAt(lineToSplit, i);
-        }
-    }
+    //}
+    // else{
+    //     string str = listRows[lineToSplit].text;
+    //     for(int i = 0; i < str.size(); i ++){
+    //         InsertCharAt(lineToSplit+1, i, str[i]);
+    //     }
+    //     for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
+    //         RemoveCharAt(lineToSplit, i);
+    //     }
+    // }
+    // cursorY++;
     SetCursorX(0);
     // SetCursorY(cursorY+1);
     // listRows.insert( listRows.begin()+row, listRows[row].substr(pos) );
@@ -365,6 +372,10 @@ void ECTextDocument :: InsertCharAt(int row, int pos, char ch)
 
     //cursor is always increased no matter what happened
     cursorX++;
+    if(cursorX > MAX_LINE_LEN){
+        cursorY++;
+        cursorX = 1;
+    }
 
 
     //Check if the line is now too long
@@ -482,13 +493,7 @@ void ECTextDocument :: RemoveCharAt(int row, int pos)
 void ECTextDocument :: CheckWrappedRows(int oldCursorX, int oldCursorY){
     logxy("CheckWrappedRows   " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     for(int curRow = 0; curRow < GetNumRows(); curRow++){
-        if(IsRowWrapped(curRow)){
-            //If a line is wrapped, we have to worry about if the line before is too short due to a character deletion
-            //This shouldnt matter if the line before is wrapped or not
-            if (GetRowLen(curRow-1) < MAX_LINE_LEN){
-                RemoveCharAt(curRow, 0);
-            }
-        }
+        
             //Else, logic from earlier
         cursorY = curRow;
         if(GetRowLen(cursorY) > MAX_LINE_LEN){
@@ -502,15 +507,23 @@ void ECTextDocument :: CheckWrappedRows(int oldCursorX, int oldCursorY){
                 //IF THE NEXT LINE IS ALREADY WRAPPED
                 else{
                     NewLine(cursorY, MAX_LINE_LEN, true);
-                    cursorY++;
+                    // cursorY++;
                     RemoveCharAt(cursorY+1, 0);
                     SetCursorX(GetRowLen(cursorY));
                 }
             }
             else{
                 NewLine(cursorY, MAX_LINE_LEN, true);
-                cursorY++;
+                // cursorY++;
                 SetCursorX(GetRowLen(cursorY));
+            }
+        }
+        if(IsRowWrapped(curRow)){
+            //If a line is wrapped, we have to worry about if the line before is too short due to a character deletion
+            //This shouldnt matter if the line before is wrapped or not
+            if (GetRowLen(curRow-1) < MAX_LINE_LEN){
+                RemoveCharAt(curRow, 0);
+                CheckWrappedRows(oldCursorX, oldCursorY);
             }
         }
     }

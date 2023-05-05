@@ -42,7 +42,7 @@ public:
     void InsertTextCommand(char ch);
 
     //Function to update the view
-    void UpdateView();
+    void UpdateView(bool checkWrappedRows);
 
     //Getters and Setters
     vector<string> GetDocument() const;                             // update the view

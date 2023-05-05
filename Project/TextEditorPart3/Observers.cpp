@@ -85,7 +85,7 @@ void ArrowKeyObserver :: Update(){
         }
     }
     //Update cursor position in view
-    _docCtrl->UpdateView();
+    _docCtrl->UpdateView(false);
 }
 
 //***********************************************************
@@ -96,7 +96,7 @@ void BackspaceObserver :: Update(){
         if(code == 127){ // code for backspace
             // logxy("backspace " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
             _docCtrl->DeleteTextCommand();
-            _docCtrl->UpdateView();
+            _docCtrl->UpdateView(true);
         }
     }    
 }
@@ -108,7 +108,7 @@ void EnterObserver :: Update(){
     if (code == 13 && _docCtrl->GetMode() == 1){
         // logxy("enter " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
         _docCtrl->NewLineCommand();
-        _docCtrl->UpdateView();
+        _docCtrl->UpdateView(true);
     }
 }
 
@@ -137,7 +137,7 @@ void InsertObserver :: Update(){
     //If in command mode but key is 'i', switch to insert mode
     // logxy("insert " + to_string(_docCtrl->GetCursorX()) + " " + to_string(_docCtrl->GetCursorY()));
     _docCtrl->InsertTextCommand( (char)code );
-    _docCtrl->UpdateView();
+    _docCtrl->UpdateView(true);
 }
 
 //***********************************************************
@@ -162,7 +162,7 @@ void UndoRedoObserver :: Update(){
     else if(code == 25){
         _docCtrl->Redo();
     }
-    _docCtrl->UpdateView();
+    _docCtrl->UpdateView(true);
 }
 
 ECEditorView :: ECEditorView(ECTextViewImp *subject, ECTextDocumentCtrl *docCtrl){
