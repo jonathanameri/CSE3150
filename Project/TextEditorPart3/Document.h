@@ -36,7 +36,6 @@ public:
     bool Redo();                                              // redo the change to the text
     
     //Commands needed to update the model
-    // void MergeLineCommand();
     void DeleteTextCommand();
     void NewLineCommand();
     void InsertTextCommand(char ch);
@@ -111,6 +110,11 @@ public:
 
     // void Dump() const;
     vector<Row> GetDocument() const;
+
+    void AddKeyword(string &word);
+    void CheckKeywords();
+    vector<vector<int>> GetKeywordPositions() const;
+    vector<int> FindWordWithinLine( int row, string &word ) const;
     
 private:
     // vector<string> listRows;
@@ -119,6 +123,8 @@ private:
     int MAX_LINE_LEN = 20;
     int MAX_NUM_ROWS = 20;
     vector<Row> listRows;
+    vector<string> keywords;
+    vector<vector<int>> keywordPositions;
     // map<int, map<int, pair<int, TEXT_COLOR> > > clrTextInfo;
 
 };

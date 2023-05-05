@@ -88,14 +88,14 @@ void ECCommandHistory:: AddCheckpoint(int x){
 void ECNewLineCmd :: Execute()
 {
     //Check if mid line or at end of line
-    // if(cursorX == -1) 
-    cursorX = doc.GetCursorX();
-    // if(cursorY == -1) 
-    cursorY = doc.GetCursorY();
+    if(cursorX == -1) 
+        cursorX = doc.GetCursorX();
+    if(cursorY == -1) 
+        cursorY = doc.GetCursorY();
     oldLine = doc.GetRow(cursorY);
 
-    if(cursorX == doc.GetRowLen(cursorY)) endOfLine = true;
-    else endOfLine = false;
+    // if(cursorX == doc.GetRowLen(cursorY)) endOfLine = true;
+    // else endOfLine = false;
 
     doc.NewLine(cursorY, cursorX, false);
     // if (cursorX == doc.GetRowLen(row))
@@ -158,14 +158,24 @@ void ECNewLineCmd :: UnExecute()
 void ECInsTextCmd :: Execute()
 {
     // insert to document
-    cursorX = doc.GetCursorX();
-    doc.InsertCharAt( row, posIns, charIns );
+    if(cursorX == -1) 
+        cursorX = doc.GetCursorX();
+    if(cursorY == -1) 
+        cursorY = doc.GetCursorY();
+    wrapped = (cursorX == doc.GetMaxLen());
+    doc.InsertCharAt( cursorY, posIns, charIns );
 }
 void ECInsTextCmd :: UnExecute()
 {
     // undo (i.e. remove the inserted characters)
-    doc.RemoveCharAt( row, posIns + 1 );
+    if(!wrapped)
+        doc.RemoveCharAt( cursorY, posIns + 1 );
+    else{
+        doc.RemoveCharAt( cursorY+1, 1);
+        doc.RemoveCharAt( cursorY+1, 0);
+    }
     doc.SetCursorX(cursorX);
+    doc.SetCursorY(cursorY);
 }
 
 
@@ -177,8 +187,10 @@ void ECInsTextCmd :: UnExecute()
 // }
 void ECDelTextCmd :: Execute()
 {
-    cursorX = doc.GetCursorX();
-    cursorY = doc.GetCursorY();
+    if(cursorX == -1) 
+        cursorX = doc.GetCursorX();
+    if(cursorY == -1) 
+        cursorY = doc.GetCursorY();
 
     //Set the boolean for UnExecute
     if(cursorX == 0) {

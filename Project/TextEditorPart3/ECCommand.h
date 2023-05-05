@@ -83,7 +83,7 @@ private:
 class ECInsTextCmd : public ECCommand
 {
 public:
-    ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns ) : doc(docIn), row(row), posIns(posInsIn), charIns(charIns) {};
+    ECInsTextCmd( ECTextDocument &docIn, int row, int posInsIn, char charIns ) : doc(docIn), row(row), posIns(posInsIn), charIns(charIns), cursorX(-1), cursorY(-1) {};
     void Execute();
     void UnExecute();
     
@@ -93,6 +93,8 @@ private:
     int posIns;
     char charIns;
     int cursorX;
+    int cursorY;
+    bool wrapped;
 };
 
 // **********************************************************
@@ -100,7 +102,7 @@ private:
 class ECDelTextCmd : public ECCommand
 {
 public:
-    ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn) : doc(docIn), rowDel(rowDel), posDel(posDelIn) {} ;
+    ECDelTextCmd( ECTextDocument &docIn, int rowDel, int posDelIn) : doc(docIn), rowDel(rowDel), posDel(posDelIn), cursorX(-1), cursorY(-1) {} ;
     // ~ECDelTextCmd();
     virtual void Execute();
     virtual void UnExecute();

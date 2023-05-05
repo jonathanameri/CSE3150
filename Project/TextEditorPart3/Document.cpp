@@ -45,6 +45,18 @@ ECTextDocumentCtrl :: ECTextDocumentCtrl(ECTextDocument &docIn, ECTextViewImp *v
         doc.RemoveCharAt(1, 0);
     }
 
+
+    // Read keywords and add them to doc
+    string line2;
+    ifstream myfile2("keywords.txt");
+    if(myfile2.is_open()){
+        while(getline(myfile2,line2)){
+            doc.AddKeyword(line2);
+
+        }
+        myfile2.close();
+    }
+
     // if (myfile.is_open())
     // {
     //     int lineNum = 0;
@@ -109,18 +121,18 @@ void ECTextDocumentCtrl :: UpdateView(bool checkWrappedRows){
     _view->ClearColor();
 
 
-
+    //Format the doc if the flag is passed through
     if ( checkWrappedRows) doc.CheckWrappedRows(GetCursorX(), GetCursorY());
 
-
-
-
     vector<Row> document = doc.GetDocument();
+
+
     // for(int i = 0; i < document.size(); i++){
     //     _view->AddRow(document[i].text);
     // }
     int displaySize = (document.size() >= doc.GetMaxRows()) ? doc.GetMaxRows() : document.size();
     for(int i = 0; i < displaySize; i++){
+        //Just for testing*****************************************
         if(document[i].wrapped){
             string extra = "";
             for(int j = 0; j < doc.GetMaxLen() - doc.GetRowLen(i); j++){
@@ -131,20 +143,22 @@ void ECTextDocumentCtrl :: UpdateView(bool checkWrappedRows){
         else{
             _view->AddRow(document[i].text);
         }
+        //Just for testing*****************************************
         // _view->AddRow(document[i].text);
     }
+    
+    doc.CheckKeywords();
+    vector<vector<int>> keywords = doc.GetKeywordPositions();
+    for(int i = 0; i < keywords.size(); i++){
+        _view->SetColor(keywords[i][0], keywords[i][1], keywords[i][2], TEXT_COLOR_BLUE);
+        // _view->AddRow("KEYWORD DETECTED");
+    }
+    // _view->SetColor(0, 2, 2, TEXT_COLOR_BLUE);
+
     _view->SetCursorX(GetCursorX());
     _view->SetCursorY(GetCursorY());
 }
 
-//Commands called by observer
-// void ECTextDocumentCtrl :: MergeLineCommand()
-// {
-//     if(mode != 1) return;
-//     ECMergeLineCmd *pCmdMerge = new ECMergeLineCmd( this->doc, doc.GetCursorY() );
-//     histCmds.ExecuteCmd( pCmdMerge );
-//     numCommands++;
-// }
 
 void ECTextDocumentCtrl :: DeleteTextCommand()
 {
@@ -331,7 +345,6 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
         // for(int i = GetRowLen(lineToSplit) ; i > 0 ; i--){
         //     RemoveCharAt(lineToSplit, i);
         // }
-
         // //Insert new lines
         // for(int i = 0; i < str2.size(); i++){
         //     InsertCharAt(lineToSplit+1, i, str2[i]);
@@ -339,7 +352,6 @@ void ECTextDocument :: NewLine(int row, int pos, bool isWrapped){
         // for(int i = 0; i < str1.size(); i++){
         //     InsertCharAt(lineToSplit, i, str1[i]);
         // }
-        
         // listRows.insert( listRows.begin()+row+1, listRows[row+1].substr(pos) );
         // listRows[row] = listRows[row].substr(0, pos);
     //}
@@ -493,7 +505,6 @@ void ECTextDocument :: RemoveCharAt(int row, int pos)
 void ECTextDocument :: CheckWrappedRows(int oldCursorX, int oldCursorY){
     logxy("CheckWrappedRows   " + to_string(GetCursorX()) + " " + to_string(GetCursorY()));
     for(int curRow = 0; curRow < GetNumRows(); curRow++){
-        
             //Else, logic from earlier
         cursorY = curRow;
         if(GetRowLen(cursorY) > MAX_LINE_LEN){
@@ -525,6 +536,10 @@ void ECTextDocument :: CheckWrappedRows(int oldCursorX, int oldCursorY){
                 RemoveCharAt(curRow, 0);
                 CheckWrappedRows(oldCursorX, oldCursorY);
             }
+            // else if (GetRowLen(curRow) == 0){
+            //     RemoveCharAt(curRow, 0);
+            //     CheckWrappedRows(GetRowLen(curRow-1), oldCursorY-1);
+            // }
         }
     }
     SetCursorX(oldCursorX);
@@ -533,11 +548,46 @@ void ECTextDocument :: CheckWrappedRows(int oldCursorX, int oldCursorY){
 
 vector<Row> ECTextDocument :: GetDocument() const
 {
-    // vector<string> doc;
-    // for(int i = 0; i < GetNumRows(); i++){
-    //     doc.push_back(GetRow(i));
-    // }
-    // // doc.erase( doc.begin()+GetNumRows() - 1);
-    // return doc;
     return listRows;
+}
+
+void ECTextDocument :: AddKeyword(string &keyword){
+    keywords.push_back(keyword);
+}
+
+vector<int> ECTextDocument :: FindWordWithinLine( int row, string &word) const{
+    vector<int> positions;
+    for(int i = 0; i < GetRowLen(row); i ++){
+        if(GetCharAt(row, i) == word[0] && i + word.size() <= GetRowLen(row)  && (i+word.size() == GetRowLen(row) || GetCharAt(row, i+word.size()) == ' ')){
+            if((i > 0 && (GetCharAt(row, i-1) != ' ' ))) continue;
+            bool flag = true;
+            for(int j = 0; j < word.size(); j++){
+                if(GetCharAt(row, i+j) != word[j]) flag = false;
+            }
+            if(flag) positions.push_back(i);
+        }
+    }
+    return positions;
+}
+
+void ECTextDocument :: CheckKeywords(){
+    keywordPositions.clear();
+    for(int i = 0; i < GetNumRows(); i ++){
+        for(int j = 0; j < keywords.size(); j++){
+            //Using string.find() for now, does not support text wrapping
+            vector<int> wordPositions = FindWordWithinLine( i, keywords[j]);
+            for( int k = 0; k < wordPositions.size(); k ++){
+                keywordPositions.push_back(vector<int>{i, wordPositions[k], wordPositions[k] + (int)keywords[j].size()-1});
+            }
+            // int pos = listRows[i].text.find(keywords[j]);
+            // if(pos != string::npos){
+            //     keywordPositions.push_back(vector<int>{i, pos, pos+ (int)keywords[j].size()-1});
+            //     // vector<int> {1, 2, 3}
+            // }
+        }
+    }
+}
+
+vector<vector<int>> ECTextDocument :: GetKeywordPositions() const{
+    return keywordPositions;
 }
