@@ -504,34 +504,36 @@ void ECTextDocument :: AddKeyword(string &keyword){
     keywords.push_back(keyword);
 }
 
-vector<int> ECTextDocument :: FindWordWithinLine( int row, string &word) const{
-    vector<int> positions;
-    for(int i = 0; i < GetRowLen(row); i ++){
-        if(GetCharAt(row, i) == word[0] && i + word.size() <= GetRowLen(row)  && (i+word.size() == GetRowLen(row) || GetCharAt(row, i+word.size()) == ' ')){
-            if((i > 0 && (GetCharAt(row, i-1) != ' ' ))) continue;
-            bool flag = true;
-            for(int j = 0; j < word.size(); j++){
-                if(GetCharAt(row, i+j) != word[j]) flag = false;
-            }
-            if(flag) positions.push_back(i);
-        }
-    }
-    return positions;
-}
-
 void ECTextDocument :: CheckKeywords(){
     keywordPositions.clear();
-    for(int i = 0; i < GetNumRows(); i ++){
-        for(int j = 0; j < keywords.size(); j++){
-            //Using string.find() for now, does not support text wrapping
-            vector<int> wordPositions = FindWordWithinLine( i, keywords[j]);
-            for( int k = 0; k < wordPositions.size(); k ++){
-                keywordPositions.push_back(vector<int>{i, wordPositions[k], wordPositions[k] + (int)keywords[j].size()-1});
+    for(int row = 0; row < GetNumRows(); row ++){
+        vector<string> words = SplitLine(row);
+        int pos = 0;
+        for( int j = 0; j < words.size(); j++){
+            if(IsKeyword(words[j])){
+                keywordPositions.push_back(vector<int>{row, pos, pos+(int)words[j].size()-1});
             }
+            pos+=words[j].size()+1;
         }
+
     }
 }
+bool ECTextDocument :: IsKeyword(string &word) const {
+    for(int i = 0; i < keywords.size(); i++){
+        if(word == keywords[i]) return true;
+    }
+    return false;
+}
 
+vector<string> ECTextDocument :: SplitLine(int row) const{
+    vector<string> result;
+    istringstream ss(GetRow(row));
+    string token;
+    while(getline(ss, token, ' ')){
+        result.push_back(token);
+    }
+    return result;
+}
 vector<vector<int>> ECTextDocument :: GetKeywordPositions() const{
     return keywordPositions;
 }

@@ -9,6 +9,7 @@
 #include <cctype>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 class ECTextDocument;
 class ECEditorView;
@@ -114,7 +115,8 @@ public:
     void AddKeyword(string &word);
     void CheckKeywords();
     vector<vector<int>> GetKeywordPositions() const;
-    vector<int> FindWordWithinLine( int row, string &word ) const;
+    bool IsKeyword(string &word) const;
+    vector<string> SplitLine(int row) const;
     
 private:
     // vector<string> listRows;
